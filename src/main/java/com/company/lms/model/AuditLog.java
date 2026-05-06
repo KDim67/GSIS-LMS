@@ -1,0 +1,52 @@
+package com.company.lms.model;
+
+import jakarta.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "audit_logs")
+public class AuditLog implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Employee user;
+
+    @Column(nullable = false, length = 100)
+    private String action;
+
+    @Column(name = "target_id")
+    private Integer targetId;
+
+    @Column(name = "timestamp", insertable = false, updatable = false)
+    private LocalDateTime timestamp;
+
+    public AuditLog() {}
+
+    // Constructor helper for the AuditService
+    public AuditLog(Employee user, String action, Integer targetId) {
+        this.user = user;
+        this.action = action;
+        this.targetId = targetId;
+    }
+
+    // Getters and Setters
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+
+    public Employee getUser() { return user; }
+    public void setUser(Employee user) { this.user = user; }
+
+    public String getAction() { return action; }
+    public void setAction(String action) { this.action = action; }
+
+    public Integer getTargetId() { return targetId; }
+    public void setTargetId(Integer targetId) { this.targetId = targetId; }
+
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+}
