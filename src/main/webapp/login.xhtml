@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Leave Management System</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+        }
+
+        .container {
+            width: 420px;
+            margin: 40px auto;
+        }
+
+        .panel-spacing {
+            margin-bottom: 25px;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+    <div class="container">
+
+        <!-- LOGIN FORM -->
+
+        <h:form id="loginForm">
+
+            <p:growl id="loginMessages"
+                     showDetail="true"
+                     life="4000"/>
+
+            <p:panel header="Σύνδεση Χρήστη"
+                     styleClass="panel-spacing">
+
+                <p:outputLabel for="email"
+                               value="Email"/>
+
+                <p:inputText id="email"
+                             value="#{loginController.email}"
+                             required="true"
+                             requiredMessage="Το email είναι υποχρεωτικό."
+                             style="width:100%"/>
+
+                <br/><br/>
+
+                <p:outputLabel for="password"
+                               value="Κωδικός"/>
+
+                <p:password id="password"
+                            value="#{loginController.password}"
+                            required="true"
+                            requiredMessage="Ο κωδικός είναι υποχρεωτικός."
+                            feedback="false"
+                            style="width:100%"/>
+
+                <br/><br/>
+
+                <p:commandButton value="Σύνδεση"
+                                 action="#{loginController.login}"
+                                 update="@form"
+                                 icon="pi pi-sign-in"
+                                 style="width:100%"/>
+            </p:panel>
+
+        </h:form>
+
+        <!-- REGISTER FORM -->
+
+        <h:form id="registerForm">
+
+            <p:growl id="registerMessages"
+                     showDetail="true"
+                     life="4000"/>
+
+            <p:panel header="Εγγραφή Υπαλλήλου">
+
+                <p:outputLabel for="firstName"
+                               value="Όνομα"/>
+
+                <p:inputText id="firstName"
+                             value="#{loginController.firstName}"
+                             required="true"
+                             requiredMessage="Το όνομα είναι υποχρεωτικό."
+                             style="width:100%"/>
+
+                <br/><br/>
+
+                <p:outputLabel for="lastName"
+                               value="Επώνυμο"/>
+
+                <p:inputText id="lastName"
+                             value="#{loginController.lastName}"
+                             required="true"
+                             requiredMessage="Το επώνυμο είναι υποχρεωτικό."
+                             style="width:100%"/>
+
+                <br/><br/>
+
+                <p:outputLabel for="registerEmail"
+                               value="Email"/>
+
+                <p:inputText id="registerEmail"
+                             value="#{loginController.registerEmail}"
+                             required="true"
+                             requiredMessage="Το email είναι υποχρεωτικό."
+                             style="width:100%"/>
+
+                <br/><br/>
+
+                <p:outputLabel for="registerPassword"
+                               value="Κωδικός"/>
+
+                <p:password id="registerPassword"
+                            value="#{loginController.registerPassword}"
+                            required="true"
+                            requiredMessage="Ο κωδικός είναι υποχρεωτικός."
+                            feedback="true"
+                            style="width:100%"/>
+
+                <br/><br/>
+
+                <p:commandButton value="Εγγραφή"
+                                 action="#{loginController.register}"
+                                 update="@form :loginForm"
+                                 icon="pi pi-user-plus"
+                                 style="width:100%"/>
+
+            </p:panel>
+
+        </h:form>
+
+    </div>
+
+</h:body>
+</html>
