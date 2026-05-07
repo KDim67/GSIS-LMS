@@ -26,7 +26,7 @@ public class Employee implements Serializable {
     @Column(name = "annual_leave_balance", nullable = false)
     private Integer annualLeaveBalance = 0;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
 
