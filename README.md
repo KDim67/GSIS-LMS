@@ -138,11 +138,4 @@ target/leave-management.war
 * `EMPLOYEE`
 * `MANAGER`
 
----
-
-# Authors
-
-* Developer 1 — Core Infrastructure & Employee Module
-* Developer 2 — Manager Module, Audit & Reporting
-
 ```
