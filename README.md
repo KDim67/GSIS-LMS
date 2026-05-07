@@ -137,5 +137,3 @@ target/leave-management.war
 
 * `EMPLOYEE`
 * `MANAGER`
-
-```
