@@ -4,7 +4,7 @@
       xmlns:p="http://primefaces.org/ui">
 
 <h:head>
-    <title>Login - Leave Management System</title>
+    <title>Register - Leave Management System</title>
 
     <style>
 
@@ -84,41 +84,63 @@
 
         </div>
 
-        <h:form id="loginForm">
+        <h:form id="registerForm">
 
             <p:growl id="messages"
                      showDetail="true"
                      life="4000"/>
 
-            <p:panel header="Σύνδεση Χρήστη">
+            <p:panel header="Εγγραφή Υπαλλήλου">
 
-                <p:outputLabel for="email"
+                <p:outputLabel for="firstName"
+                               value="Όνομα"/>
+
+                <p:inputText id="firstName"
+                             value="#{loginController.firstName}"
+                             required="true"
+                             requiredMessage="Το όνομα είναι υποχρεωτικό."
+                             style="width:100%"/>
+
+                <br/><br/>
+
+                <p:outputLabel for="lastName"
+                               value="Επώνυμο"/>
+
+                <p:inputText id="lastName"
+                             value="#{loginController.lastName}"
+                             required="true"
+                             requiredMessage="Το επώνυμο είναι υποχρεωτικό."
+                             style="width:100%"/>
+
+                <br/><br/>
+
+                <p:outputLabel for="registerEmail"
                                value="Email"/>
 
-                <p:inputText id="email"
-                             value="#{loginController.email}"
+                <p:inputText id="registerEmail"
+                             value="#{loginController.registerEmail}"
                              required="true"
                              requiredMessage="Το email είναι υποχρεωτικό."
                              style="width:100%"/>
 
                 <br/><br/>
 
-                <p:outputLabel for="password"
+                <p:outputLabel for="registerPassword"
                                value="Κωδικός"/>
 
-                <p:password id="password"
-                            value="#{loginController.password}"
+                <p:password id="registerPassword"
+                            value="#{loginController.registerPassword}"
                             required="true"
                             requiredMessage="Ο κωδικός είναι υποχρεωτικός."
-                            feedback="false"
+                            feedback="true"
                             style="width:100%"/>
 
                 <br/><br/>
 
-                <p:commandButton value="Σύνδεση"
-                                 action="#{loginController.login}"
+                <p:commandButton value="Εγγραφή"
+                                 action="#{loginController.register}"
                                  update="@form"
-                                 icon="pi pi-sign-in"
+                                 icon="pi pi-user-plus"
                                  style="width:100%"/>
 
             </p:panel>

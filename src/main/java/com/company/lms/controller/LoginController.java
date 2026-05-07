@@ -67,6 +67,13 @@ public class LoginController implements Serializable {
                     registerPassword
             );
 
+            clearRegisterForm();
+
+            FacesContext.getCurrentInstance()
+                    .getExternalContext()
+                    .getFlash()
+                    .setKeepMessages(true);
+
             FacesContext.getCurrentInstance().addMessage(
                     null,
                     new FacesMessage(
@@ -76,9 +83,7 @@ public class LoginController implements Serializable {
                     )
             );
 
-            clearRegisterForm();
-
-            return null;
+            return "/login.xhtml?faces-redirect=true";
 
         } catch (IllegalArgumentException e) {
 
