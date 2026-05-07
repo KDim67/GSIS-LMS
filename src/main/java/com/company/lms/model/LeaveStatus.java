@@ -1,7 +1,13 @@
 package com.company.lms.model;
 
 public enum LeaveStatus {
-    PENDING,
-    APPROVED,
-    REJECTED
+    APPROVED, PENDING, REJECTED;
+
+    public String getDisplayName() {
+        return switch (this) {
+            case APPROVED -> "Εγκρίθηκε";
+            case PENDING  -> "Εκκρεμεί";
+            case REJECTED -> "Απορρίφθηκε";
+        };
+    }
 }

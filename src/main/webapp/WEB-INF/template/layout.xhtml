@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Σύστημα Διαχείρισης Αδειών — ΓΓΠΣ&amp;ΨΔ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <h:outputStylesheet name="css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&amp;family=Source+Serif+4:wght@600;700&amp;display=swap"
+          rel="stylesheet" />
+</h:head>
+
+<h:body>
+
+    <ui:include src="header.xhtml" />
+
+    <div class="container">
+        <ui:insert name="content">
+        </ui:insert>
+    </div>
+
+</h:body>
+</html>

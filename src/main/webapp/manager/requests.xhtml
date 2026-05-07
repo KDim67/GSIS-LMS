@@ -1,0 +1,172 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="content">
+        
+        <h:form id="requestsForm">
+            <p:growl id="messages" showDetail="true" life="4000" />
+
+            <div class="page-header">
+                <h2>
+                    <i class="pi pi-list"></i>
+                    Εκκρεμή Αιτήματα Άδειας
+                </h2>
+                <span class="badge badge-pending">
+                    <i class="pi pi-clock"></i>
+                    #{managerController.pendingRequests.size()} εκκρεμή
+                </span>
+            </div>
+
+            <p:dataTable id="requestsTable"
+                         value="#{managerController.pendingRequests}"
+                         var="leaveReq"
+                         rowKey="#{leaveReq.id}"
+                         emptyMessage="Δεν υπάρχουν εκκρεμή αιτήματα αυτή τη στιγμή."
+                         paginator="true"
+                         rows="10"
+                         paginatorPosition="bottom"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,20,50"
+                         style="margin-top:0;">
+
+                <p:column headerText="Υπάλληλος" sortBy="#{leaveReq.employee.lastName}">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="width:32px; height:32px; border-radius:50%;
+                                     background:var(--blue-light); color:var(--blue);
+                                     display:inline-flex; align-items:center; justify-content:center;
+                                     font-weight:700; font-size:0.85rem; flex-shrink:0;">
+                            #{not empty leaveReq.employee.firstName ? leaveReq.employee.firstName.substring(0,1) : ''}#{not empty leaveReq.employee.lastName ? leaveReq.employee.lastName.substring(0,1) : ''}
+                        </span>
+                        <span class="fw-bold">
+                            #{leaveReq.employee.firstName} #{leaveReq.employee.lastName}
+                        </span>
+                    </div>
+                </p:column>
+
+                <p:column headerText="Τύπος Άδειας" sortBy="#{leaveReq.leaveType}">
+                    <span class="badge badge-pending">#{leaveReq.leaveType}</span>
+                </p:column>
+
+                <p:column headerText="Από" sortBy="#{leaveReq.startDate}">
+                    <h:outputText value="#{leaveReq.startDate}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Έως" sortBy="#{leaveReq.endDate}">
+                    <h:outputText value="#{leaveReq.endDate}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Ημέρες" style="text-align:center; width:80px;">
+                    <span class="fw-bold text-blue">#{leaveReq.durationDays}</span>
+                </p:column>
+
+                <p:column headerText="Αιτιολόγηση">
+                    <h:outputText value="#{leaveReq.reason}" style="color:var(--text-sub);" />
+                </p:column>
+
+                <p:column headerText="Ενέργειες" style="width:200px; text-align:center;">
+                    <p:commandButton icon="pi pi-check"
+                                     value="Έγκριση"
+                                     styleClass="btn-approve"
+                                     style="margin-right:8px;"
+                                     update=":dialogForm:actionDialogPanel"
+                                     oncomplete="PF('actionDialog').show()">
+                        <f:setPropertyActionListener value="#{leaveReq}" target="#{managerController.selectedRequest}" />
+                        <f:setPropertyActionListener value="APPROVE" target="#{managerController.pendingAction}" />
+                    </p:commandButton>
+
+                    <p:commandButton icon="pi pi-times"
+                                     value="Απόρριψη"
+                                     styleClass="btn-reject"
+                                     update=":dialogForm:actionDialogPanel"
+                                     oncomplete="PF('actionDialog').show()">
+                        <f:setPropertyActionListener value="#{leaveReq}" target="#{managerController.selectedRequest}" />
+                        <f:setPropertyActionListener value="REJECT" target="#{managerController.pendingAction}" />
+                    </p:commandButton>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Ανασκόπηση Αιτήματος Άδειας"
+                  widgetVar="actionDialog"
+                  modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false"
+                  appendTo="@(body)"
+                  style="width:480px;">
+
+            <h:form id="dialogForm">
+                <p:outputPanel id="actionDialogPanel">
+                    <h:panelGroup rendered="#{not empty managerController.selectedRequest}">
+
+                        <div class="dialog-employee-info">
+                            <i class="pi pi-user"></i>
+                            #{managerController.selectedRequest.employee.firstName}
+                            #{managerController.selectedRequest.employee.lastName}
+                            —
+                            <span style="font-weight:400; color:var(--text-sub);">
+                                #{managerController.selectedRequest.leaveType}
+                            </span>
+                        </div>
+
+                        <div style="background:var(--bg); border-radius:var(--radius); padding:12px 14px; margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.875rem;">
+                            <div>
+                                <span class="text-muted" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.4px; font-weight:700; display:block;">Από</span>
+                                <h:outputText value="#{managerController.selectedRequest.startDate}">
+                                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </div>
+                            <div>
+                                <span class="text-muted" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.4px; font-weight:700; display:block;">Έως</span>
+                                <h:outputText value="#{managerController.selectedRequest.endDate}">
+                                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </div>
+                        </div>
+
+                        <div class="dialog-comment-wrap">
+                            <label>Σχόλιο Διαχειριστή
+                                <span class="text-muted">(απαιτείται για απόρριψη)</span>
+                            </label>
+                            <p:inputTextarea rows="4" style="width:100%;" placeholder="Προσθέστε σχόλιο..." value="#{managerController.managerComment}" />
+                        </div>
+
+                        <div class="dialog-actions">
+                            <p:commandButton value="Ακύρωση"
+                                             icon="pi pi-ban"
+                                             styleClass="btn-export"
+                                             onclick="PF('actionDialog').hide(); return false;" />
+
+                            <p:commandButton value="Επιβεβαίωση Απόρριψης"
+                                             rendered="#{managerController.pendingAction eq 'REJECT'}"
+                                             action="#{managerController.rejectLeave}"
+                                             update=":requestsForm"
+                                             oncomplete="PF('actionDialog').hide()"
+                                             styleClass="btn-reject"
+                                             icon="pi pi-times" />
+
+                            <p:commandButton value="Επιβεβαίωση Έγκρισης"
+                                             rendered="#{managerController.pendingAction eq 'APPROVE'}"
+                                             action="#{managerController.approveLeave}"
+                                             update=":requestsForm"
+                                             oncomplete="PF('actionDialog').hide()"
+                                             styleClass="btn-approve"
+                                             icon="pi pi-check" />
+                        </div>
+
+                    </h:panelGroup>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

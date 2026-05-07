@@ -22,16 +22,20 @@ public class AuditLog implements Serializable {
     @Column(name = "target_id")
     private Integer targetId;
 
+    // Added the comment field to map to the database column
+    @Column(length = 500)
+    private String comment;
+
     @Column(name = "timestamp", insertable = false, updatable = false)
     private LocalDateTime timestamp;
 
     public AuditLog() {}
 
-    // Constructor helper for the AuditService
-    public AuditLog(Employee user, String action, Integer targetId) {
+    public AuditLog(Employee user, String action, Integer targetId, String comment) {
         this.user = user;
         this.action = action;
         this.targetId = targetId;
+        this.comment = comment;
     }
 
     // Getters and Setters
@@ -46,6 +50,9 @@ public class AuditLog implements Serializable {
 
     public Integer getTargetId() { return targetId; }
     public void setTargetId(Integer targetId) { this.targetId = targetId; }
+
+    public String getComment() { return comment; }
+    public void setComment(String comment) { this.comment = comment; }
 
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }

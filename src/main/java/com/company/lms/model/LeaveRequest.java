@@ -3,6 +3,7 @@ package com.company.lms.model;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "leaves")
@@ -12,7 +13,7 @@ public class LeaveRequest implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
@@ -36,6 +37,15 @@ public class LeaveRequest implements Serializable {
     private LeaveStatus status = LeaveStatus.PENDING;
 
     public LeaveRequest() {}
+
+    @Transient
+    public long getDurationDays() {
+        if (startDate != null && endDate != null) {
+            // Adds 1 to include both the start and end dates in the count
+            return ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        }
+        return 0;
+    }
 
     // Getters and Setters
     public Integer getId() { return id; }
