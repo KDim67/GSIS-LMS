@@ -9,12 +9,16 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
+import java.util.regex.Pattern;
 
 @Named
 @SessionScoped
 public class LoginController implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 
     @Inject
     private AuthService authService;
@@ -26,87 +30,151 @@ public class LoginController implements Serializable {
     private String lastName;
     private String registerEmail;
     private String registerPassword;
+    private String confirmPassword;
 
     private Employee loggedInUser;
 
     public String login() {
 
-        loggedInUser = authService.login(email, password);
+        if (!isValidEmail(email)) {
 
-        if (loggedInUser == null) {
+            this.email = null;
 
-            FacesContext.getCurrentInstance().addMessage(
-                    null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_ERROR,
-                            "Λάθος email ή κωδικός.",
-                            null
-                    )
-            );
+            addMessage(FacesMessage.SEVERITY_ERROR,
+                    "Παρακαλώ εισάγετε έγκυρη διεύθυνση email.");
 
             return null;
         }
 
+        if (!authService.emailExists(email)) {
+            addMessage(FacesMessage.SEVERITY_WARN,
+                    "Δεν υπάρχει λογαριασμός με αυτό το email. Παρακαλώ κάντε εγγραφή.");
+            return null;
+        }
+
+        loggedInUser = authService.login(email, password);
+
+        if (loggedInUser == null) {
+            addMessage(FacesMessage.SEVERITY_ERROR,
+                    "Λάθος κωδικός πρόσβασης.");
+            return null;
+        }
+
+        clearLoginForm();
+
         String role = loggedInUser.getRole().getRoleName();
 
         if ("MANAGER".equals(role)) {
-            return "/manager/requests.xhtml?faces-redirect=true";
+            return "/faces/manager/requests.xhtml?faces-redirect=true";
         }
 
-        return "/employee/dashboard.xhtml?faces-redirect=true";
+        return "/faces/employee/dashboard.xhtml?faces-redirect=true";
     }
 
     public String register() {
 
-        try {
+        if (!isValidEmail(registerEmail)) {
 
-            authService.register(
-                    firstName,
-                    lastName,
-                    registerEmail,
-                    registerPassword
-            );
+            this.registerEmail = null;
+
+            addMessage(FacesMessage.SEVERITY_ERROR,
+                    "Παρακαλώ εισάγετε έγκυρη διεύθυνση email.");
+
+            return null;
+        }
+
+        if (!isStrongPassword(registerPassword)) {
+            addMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες, ένα κεφαλαίο γράμμα, ένα πεζό γράμμα και έναν αριθμό.");
+            return null;
+        }
+
+        if (!registerPassword.equals(confirmPassword)) {
+            addMessage(FacesMessage.SEVERITY_ERROR,
+                    "Οι κωδικοί πρόσβασης δεν ταιριάζουν.");
+            return null;
+        }
+
+        if (authService.emailExists(registerEmail)) {
+            keepMessagesAfterRedirect();
+
+            addMessage(FacesMessage.SEVERITY_WARN,
+                    "Υπάρχει ήδη λογαριασμός με αυτό το email. Παρακαλώ κάντε σύνδεση.");
 
             clearRegisterForm();
+            return "/faces/login.xhtml?faces-redirect=true";
+        }
 
-            FacesContext.getCurrentInstance()
-                    .getExternalContext()
-                    .getFlash()
-                    .setKeepMessages(true);
+        try {
+            authService.register(firstName, lastName, registerEmail, registerPassword);
 
-            FacesContext.getCurrentInstance().addMessage(
-                    null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_INFO,
-                            "Η εγγραφή ολοκληρώθηκε. Μπορείς να συνδεθείς.",
-                            null
-                    )
-            );
+            clearRegisterForm();
+            keepMessagesAfterRedirect();
 
-            return "/login.xhtml?faces-redirect=true";
+            addMessage(FacesMessage.SEVERITY_INFO,
+                    "Η εγγραφή ολοκληρώθηκε. Μπορείς να συνδεθείς.");
+
+            return "/faces/login.xhtml?faces-redirect=true";
 
         } catch (IllegalArgumentException e) {
-
-            FacesContext.getCurrentInstance().addMessage(
-                    null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_ERROR,
-                            e.getMessage(),
-                            null
-                    )
-            );
-
+            addMessage(FacesMessage.SEVERITY_ERROR, e.getMessage());
             return null;
         }
     }
 
     public String logout() {
+        clearLoginForm();
+        clearRegisterForm();
 
         FacesContext.getCurrentInstance()
                 .getExternalContext()
                 .invalidateSession();
 
-        return "/login.xhtml?faces-redirect=true";
+        return "/faces/login.xhtml?faces-redirect=true";
+    }
+
+    private boolean isValidEmail(String email) {
+        return email != null && EMAIL_PATTERN.matcher(email).matches();
+    }
+
+    private boolean isStrongPassword(String password) {
+
+        if (password == null || password.length() < 8) {
+            return false;
+        }
+
+        boolean hasUppercase = password.matches(".*[A-Z].*");
+        boolean hasLowercase = password.matches(".*[a-z].*");
+        boolean hasDigit = password.matches(".*\\d.*");
+
+        return hasUppercase && hasLowercase && hasDigit;
+    }
+
+    private void addMessage(FacesMessage.Severity severity, String message) {
+        FacesContext.getCurrentInstance().addMessage(
+                null,
+                new FacesMessage(severity, message, null)
+        );
+    }
+
+    private void keepMessagesAfterRedirect() {
+        FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getFlash()
+                .setKeepMessages(true);
+    }
+
+    private void clearLoginForm() {
+        email = null;
+        password = null;
+    }
+
+    private void clearRegisterForm() {
+        firstName = null;
+        lastName = null;
+        registerEmail = null;
+        registerPassword = null;
+        confirmPassword = null;
     }
 
     public boolean isLoggedIn() {
@@ -114,7 +182,6 @@ public class LoginController implements Serializable {
     }
 
     public String getLoggedInUserRole() {
-
         if (loggedInUser == null || loggedInUser.getRole() == null) {
             return null;
         }
@@ -122,63 +189,26 @@ public class LoginController implements Serializable {
         return loggedInUser.getRole().getRoleName();
     }
 
-    private void clearRegisterForm() {
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-        firstName = null;
-        lastName = null;
-        registerEmail = null;
-        registerPassword = null;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getRegisterEmail() { return registerEmail; }
+    public void setRegisterEmail(String registerEmail) { this.registerEmail = registerEmail; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getRegisterPassword() { return registerPassword; }
+    public void setRegisterPassword(String registerPassword) { this.registerPassword = registerPassword; }
 
-    public String getFirstName() {
-        return firstName;
-    }
+    public String getConfirmPassword() { return confirmPassword; }
+    public void setConfirmPassword(String confirmPassword) { this.confirmPassword = confirmPassword; }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getRegisterEmail() {
-        return registerEmail;
-    }
-
-    public void setRegisterEmail(String registerEmail) {
-        this.registerEmail = registerEmail;
-    }
-
-    public String getRegisterPassword() {
-        return registerPassword;
-    }
-
-    public void setRegisterPassword(String registerPassword) {
-        this.registerPassword = registerPassword;
-    }
-
-    public Employee getLoggedInUser() {
-        return loggedInUser;
-    }
+    public Employee getLoggedInUser() { return loggedInUser; }
 }
