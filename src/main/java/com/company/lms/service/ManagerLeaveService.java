@@ -5,6 +5,7 @@ import com.company.lms.model.LeaveRequest;
 import com.company.lms.model.LeaveStatus;
 import com.company.lms.repository.EmployeeRepository;
 import com.company.lms.repository.LeaveRepository;
+import com.company.lms.util.GreekHolidayUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,7 @@ import jakarta.transaction.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @ApplicationScoped
 public class ManagerLeaveService {
@@ -82,14 +84,19 @@ public class ManagerLeaveService {
         leaveRepo.update(request);
     }
 
-    // Calculate working days (Subtract weekends).
     private int calculateWorkingDays(LocalDate startDate, LocalDate endDate) {
         int workingDays = 0;
         LocalDate currentDate = startDate;
-        
+        int cachedYear = -1;
+        Set<LocalDate> holidays = null;
+
         while (!currentDate.isAfter(endDate)) {
-            if (currentDate.getDayOfWeek() != DayOfWeek.SATURDAY && 
-                currentDate.getDayOfWeek() != DayOfWeek.SUNDAY) {
+            if (currentDate.getYear() != cachedYear) {
+                cachedYear = currentDate.getYear();
+                holidays = GreekHolidayUtil.getHolidays(cachedYear);
+            }
+            DayOfWeek dow = currentDate.getDayOfWeek();
+            if (dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY && !holidays.contains(currentDate)) {
                 workingDays++;
             }
             currentDate = currentDate.plusDays(1);

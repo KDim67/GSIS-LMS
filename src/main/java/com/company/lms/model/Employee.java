@@ -17,17 +17,17 @@ public class Employee implements Serializable {
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    @Column(unique = true, nullable = false, length = 100)
+    @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
     @Column(name = "annual_leave_balance", nullable = false)
     private Integer annualLeaveBalance = 0;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
     public Employee() {}

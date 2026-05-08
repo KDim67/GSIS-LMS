@@ -26,14 +26,14 @@ public class LeaveRequest implements Serializable {
     @Column(name = "leave_type", nullable = false, length = 50)
     private String leaveType;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "reason", columnDefinition = "TEXT")
     private String reason;
 
     @Column(name = "manager_comment", columnDefinition = "TEXT")
     private String managerComment;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(name = "status", nullable = false, length = 20)
     private LeaveStatus status = LeaveStatus.PENDING;
 
     public LeaveRequest() {}

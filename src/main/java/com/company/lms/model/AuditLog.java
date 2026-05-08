@@ -13,20 +13,19 @@ public class AuditLog implements Serializable {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Employee user;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "action", nullable = false, length = 100)
     private String action;
 
-    @Column(name = "target_id")
+    @Column(name = "target_id", nullable = false)
     private Integer targetId;
 
-    // Added the comment field to map to the database column
-    @Column(length = 500)
+    @Column(name = "comment", length = 500)
     private String comment;
 
-    @Column(name = "timestamp", insertable = false, updatable = false)
+    @Column(name = "timestamp", nullable = false)
     private LocalDateTime timestamp;
 
     public AuditLog() {}
@@ -36,6 +35,7 @@ public class AuditLog implements Serializable {
         this.action = action;
         this.targetId = targetId;
         this.comment = comment;
+        this.timestamp = LocalDateTime.now();
     }
 
     // Getters and Setters

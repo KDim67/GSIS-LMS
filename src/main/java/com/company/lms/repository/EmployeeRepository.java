@@ -11,6 +11,10 @@ public class EmployeeRepository {
     @PersistenceContext
     private EntityManager em;
 
+    public Employee findById(Integer id) {
+        return em.find(Employee.class, id);
+    }
+
     public void update(Employee employee) {
         em.merge(employee);
     }

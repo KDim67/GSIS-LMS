@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="content">
+
+        <h:form id="employeeHistoryForm">
+            <p:growl id="messages" showDetail="true" life="4000" />
+
+            <div class="page-header">
+                <h2>
+                    <i class="pi pi-calendar"></i>
+                    Ιστορικό Αδειών
+                </h2>
+                <span class="badge badge-pending">
+                    <i class="pi pi-list"></i>
+                    #{employeeController.leaveHistory.size()} αιτήματα
+                </span>
+            </div>
+
+            <p:dataTable id="historyTable"
+                         value="#{employeeController.leaveHistory}"
+                         var="leaveReq"
+                         rowKey="#{leaveReq.id}"
+                         emptyMessage="Δεν υπάρχουν αιτήματα άδειας."
+                         paginator="true"
+                         rows="10"
+                         paginatorPosition="bottom"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,20,50"
+                         style="margin-top:0;">
+
+                <p:column headerText="Τύπος Άδειας" sortBy="#{leaveReq.leaveType}">
+                    <span class="badge badge-pending">#{leaveReq.leaveType}</span>
+                </p:column>
+
+                <p:column headerText="Από" sortBy="#{leaveReq.startDate}">
+                    <h:outputText value="#{leaveReq.startDate}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Έως" sortBy="#{leaveReq.endDate}">
+                    <h:outputText value="#{leaveReq.endDate}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Ημέρες" style="text-align:center; width:80px;">
+                    <span class="fw-bold text-blue">#{leaveReq.durationDays}</span>
+                </p:column>
+
+                <p:column headerText="Κατάσταση" sortBy="#{leaveReq.status}">
+                    <span class="#{leaveReq.status.name() eq 'APPROVED' ? 'badge badge-approved' : leaveReq.status.name() eq 'REJECTED' ? 'badge badge-rejected' : 'badge badge-pending'}">
+                        #{leaveReq.status.displayName}
+                    </span>
+                </p:column>
+
+                <p:column headerText="Αιτιολόγηση">
+                    <h:outputText value="#{leaveReq.reason}" style="color:var(--text-sub);" />
+                </p:column>
+
+                <p:column headerText="Σχόλιο Επόπτη" style="width:150px; text-align:center;">
+                    <p:commandButton icon="pi pi-comment"
+                                     value="Προβολή"
+                                     rendered="#{not empty leaveReq.managerComment}"
+                                     update=":commentDialogForm:commentDialogPanel"
+                                     oncomplete="PF('commentDialog').show()">
+                        <f:setPropertyActionListener value="#{leaveReq}" target="#{employeeController.selectedRequest}" />
+                    </p:commandButton>
+
+                    <h:outputText value="-"
+                                  rendered="#{empty leaveReq.managerComment}"
+                                  style="color:var(--text-sub);" />
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Σχόλιο Επόπτη"
+                  widgetVar="commentDialog"
+                  modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false"
+                  appendTo="@(body)"
+                  style="width:460px;">
+
+            <h:form id="commentDialogForm">
+                <p:outputPanel id="commentDialogPanel">
+                    <h:panelGroup rendered="#{not empty employeeController.selectedRequest}">
+                        <div class="dialog-employee-info">
+                            <i class="pi pi-comment"></i>
+                            #{employeeController.selectedRequest.leaveType}
+                        </div>
+
+                        <div style="background:var(--bg); border-radius:var(--radius); padding:14px; color:var(--text-main);">
+                            #{employeeController.selectedRequest.managerComment}
+                        </div>
+
+                        <div class="dialog-actions">
+                            <p:commandButton value="Κλείσιμο"
+                                             icon="pi pi-times"
+                                             styleClass="btn-export"
+                                             onclick="PF('commentDialog').hide(); return false;" />
+                        </div>
+                    </h:panelGroup>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

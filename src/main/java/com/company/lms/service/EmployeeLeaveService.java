@@ -1,0 +1,104 @@
+package com.company.lms.service;
+
+import com.company.lms.model.Employee;
+import com.company.lms.model.LeaveRequest;
+import com.company.lms.model.LeaveStatus;
+import com.company.lms.repository.EmployeeRepository;
+import com.company.lms.repository.LeaveRepository;
+import com.company.lms.util.GreekHolidayUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+
+@ApplicationScoped
+public class EmployeeLeaveService {
+
+    @Inject
+    private LeaveRepository leaveRepo;
+
+    @Inject
+    private EmployeeRepository employeeRepo;
+
+    public Employee getEmployee(Integer employeeId) {
+        return employeeRepo.findById(employeeId);
+    }
+
+    public List<LeaveRequest> getLeaveHistory(Integer employeeId) {
+        return leaveRepo.findByEmployeeId(employeeId);
+    }
+
+    @Transactional
+    public void submitLeaveRequest(Integer employeeId, LocalDate startDate, LocalDate endDate, String leaveType, String reason) {
+        Employee employee = employeeRepo.findById(employeeId);
+
+        if (employee == null) {
+            throw new IllegalArgumentException("Ο υπάλληλος δεν βρέθηκε.");
+        }
+
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Παρακαλώ επιλέξτε ημερομηνία έναρξης και λήξης.");
+        }
+
+        if (startDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Η ημερομηνία έναρξης δεν μπορεί να είναι στο παρελθόν.");
+        }
+
+        if (endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("Η ημερομηνία λήξης δεν μπορεί να προηγείται της ημερομηνίας έναρξης.");
+        }
+
+        if (leaveType == null || leaveType.trim().isEmpty()) {
+            throw new IllegalArgumentException("Παρακαλώ επιλέξτε τύπο άδειας.");
+        }
+
+        int workingDays = calculateWorkingDays(startDate, endDate);
+
+        if (workingDays <= 0) {
+            throw new IllegalArgumentException("Το διάστημα άδειας πρέπει να περιλαμβάνει τουλάχιστον μία εργάσιμη ημέρα.");
+        }
+
+        if (employee.getAnnualLeaveBalance() < workingDays) {
+            throw new IllegalStateException("Οι εργάσιμες ημέρες υπερβαίνουν το διαθέσιμο υπόλοιπο άδειας.");
+        }
+
+        if (leaveRepo.existsOverlappingRequest(employeeId, startDate, endDate)) {
+            throw new IllegalStateException("Υπάρχει ήδη εκκρεμές ή εγκεκριμένο αίτημα για το επιλεγμένο διάστημα.");
+        }
+
+        LeaveRequest request = new LeaveRequest();
+        request.setEmployee(employee);
+        request.setStartDate(startDate);
+        request.setEndDate(endDate);
+        request.setLeaveType(leaveType.trim());
+        request.setReason(reason);
+        request.setStatus(LeaveStatus.PENDING);
+
+        leaveRepo.save(request);
+    }
+
+    public int calculateWorkingDays(LocalDate startDate, LocalDate endDate) {
+        int workingDays = 0;
+        LocalDate currentDate = startDate;
+        int cachedYear = -1;
+        Set<LocalDate> holidays = null;
+
+        while (!currentDate.isAfter(endDate)) {
+            if (currentDate.getYear() != cachedYear) {
+                cachedYear = currentDate.getYear();
+                holidays = GreekHolidayUtil.getHolidays(cachedYear);
+            }
+            DayOfWeek dow = currentDate.getDayOfWeek();
+            if (dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY && !holidays.contains(currentDate)) {
+                workingDays++;
+            }
+            currentDate = currentDate.plusDays(1);
+        }
+
+        return workingDays;
+    }
+}

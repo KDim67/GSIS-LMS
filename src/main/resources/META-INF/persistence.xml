@@ -15,7 +15,7 @@
         <class>com.company.lms.model.AuditLog</class>
 
         <properties>
-            <property name="jakarta.persistence.schema-generation.database.action" value="none"/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
             <property name="eclipselink.logging.level" value="FINE"/>
         </properties>
 

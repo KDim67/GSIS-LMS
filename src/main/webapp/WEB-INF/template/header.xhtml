@@ -66,7 +66,7 @@
             </h:panelGroup>
 
             <!-- Manager menu -->
-            <h:panelGroup rendered="#{loginController.loggedInUserRole eq 'MANAGER'}">
+            <h:panelGroup rendered="#{loginController.loggedInUserRole.toUpperCase() eq 'MANAGER'}">
 
                 <h:outputLink value="#{request.contextPath}/manager/stats.xhtml"
                               styleClass="nav-item #{request.servletPath.contains('stats') ? 'active' : ''}">
@@ -89,17 +89,17 @@
             </h:panelGroup>
 
             <!-- Employee menu -->
-            <h:panelGroup rendered="#{loginController.loggedInUserRole eq 'EMPLOYEE'}">
+            <h:panelGroup rendered="#{loginController.loggedInUserRole.toUpperCase() eq 'EMPLOYEE'}">
 
                 <h:outputLink value="#{request.contextPath}/employee/dashboard.xhtml"
-                              styleClass="nav-item #{request.servletPath.contains('dashboard') ? 'active' : ''}">
-                    <i class="pi pi-home"></i>
-                    <span>Dashboard</span>
+                              styleClass="nav-item #{request.servletPath.contains('/employee/dashboard') ? 'active' : ''}">
+                    <i class="pi pi-send"></i>
+                    <span>Νέο Αίτημα Άδειας</span>
                 </h:outputLink>
 
                 <h:outputLink value="#{request.contextPath}/employee/history.xhtml"
-                              styleClass="nav-item #{request.servletPath.contains('history') ? 'active' : ''}">
-                    <i class="pi pi-calendar"></i>
+                              styleClass="nav-item #{request.servletPath.contains('/employee/history') ? 'active' : ''}">
+                    <i class="pi pi-history"></i>
                     <span>Ιστορικό Αδειών</span>
                 </h:outputLink>
 

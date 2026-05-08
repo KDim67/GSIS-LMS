@@ -19,6 +19,9 @@ public class ManagerController implements Serializable {
     @Inject
     private ManagerLeaveService managerService;
 
+    @Inject
+    private LoginController loginController;
+
     private List<LeaveRequest> pendingRequests;
     private LeaveRequest selectedRequest;
     private String managerComment;
@@ -35,8 +38,7 @@ public class ManagerController implements Serializable {
 
     public void approveLeave() {
         try {
-            // TODO: Retrieve the actual logged-in manager from the SecurityContext
-            Employee currentManager = null; 
+            Employee currentManager = loginController.getLoggedInUser();
 
             managerService.approveLeave(selectedRequest.getId(), currentManager, managerComment);
             
@@ -63,8 +65,7 @@ public class ManagerController implements Serializable {
                 return;
             }
 
-            // TODO: Retrieve the actual logged-in manager from the SecurityContext
-            Employee currentManager = null;
+            Employee currentManager = loginController.getLoggedInUser();
 
             managerService.rejectLeave(selectedRequest.getId(), currentManager, managerComment);
             
