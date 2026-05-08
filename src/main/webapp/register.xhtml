@@ -1,151 +1,152 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
 
 <h:head>
-    <title>Register - Leave Management System</title>
+    <title>Εγγραφή - Leave Management System</title>
 
-    <style>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0"/>
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 0;
-        }
-
-        .top-bar {
-            background-color: #0188ca;
-            color: white;
-            padding: 18px;
-            text-align: center;
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .auth-container {
-            width: 420px;
-            margin: 60px auto;
-        }
-
-        .auth-menu {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .auth-link {
-            margin: 0 10px;
-            color: #0188ca;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .auth-link:hover {
-            color: #ed5929;
-        }
-
-        .ui-panel-titlebar {
-            background: #0188ca !important;
-            color: white !important;
-            border: none !important;
-        }
-
-        .ui-button {
-            background: #ed5929 !important;
-            border: none !important;
-        }
-
-        .ui-button:hover {
-            background: #d94f22 !important;
-        }
-
-    </style>
-
+    <h:outputStylesheet library="css"
+                        name="style.css"/>
 </h:head>
 
 <h:body>
 
-    <div class="top-bar">
-        Γενική Γραμματεία Πληροφοριακών Συστημάτων
-    </div>
+    <ui:include src="/WEB-INF/template/header.xhtml"/>
 
-    <div class="auth-container">
+    <div class="container">
 
-        <div class="auth-menu">
-
-            <h:link outcome="/login.xhtml"
-                    value="Login"
-                    styleClass="auth-link"/>
-
-            <h:link outcome="/register.xhtml"
-                    value="Register"
-                    styleClass="auth-link"/>
-
+        <div class="page-header">
+            <h2>
+                <i class="pi pi-user-plus"></i>
+                Εγγραφή Υπαλλήλου
+            </h2>
         </div>
 
-        <h:form id="registerForm">
+        <div class="card"
+             style="max-width: 520px; margin: 0 auto;">
 
-            <p:growl id="messages"
-                     showDetail="true"
-                     life="4000"/>
+            <div class="card-header">
+                <h3>
+                    <i class="pi pi-user-edit"></i>
+                    Δημιουργία νέου λογαριασμού
+                </h3>
+            </div>
 
-            <p:panel header="Εγγραφή Υπαλλήλου">
+            <div class="card-body">
 
-                <p:outputLabel for="firstName"
-                               value="Όνομα"/>
+                <h:form id="registerForm">
 
-                <p:inputText id="firstName"
-                             value="#{loginController.firstName}"
-                             required="true"
-                             requiredMessage="Το όνομα είναι υποχρεωτικό."
-                             style="width:100%"/>
+                    <p:growl id="messages"
+                             showDetail="true"
+                             life="4000"/>
 
-                <br/><br/>
+                    <div class="dialog-comment-wrap">
 
-                <p:outputLabel for="lastName"
-                               value="Επώνυμο"/>
+                        <p:outputLabel for="firstName"
+                                       value="Όνομα"/>
 
-                <p:inputText id="lastName"
-                             value="#{loginController.lastName}"
-                             required="true"
-                             requiredMessage="Το επώνυμο είναι υποχρεωτικό."
-                             style="width:100%"/>
+                        <p:inputText id="firstName"
+                                     value="#{loginController.firstName}"
+                                     required="true"
+                                     requiredMessage="Το όνομα είναι υποχρεωτικό."
+                                     style="width:100%"/>
 
-                <br/><br/>
+                    </div>
 
-                <p:outputLabel for="registerEmail"
-                               value="Email"/>
+                    <div class="dialog-comment-wrap">
 
-                <p:inputText id="registerEmail"
-                             value="#{loginController.registerEmail}"
-                             required="true"
-                             requiredMessage="Το email είναι υποχρεωτικό."
-                             style="width:100%"/>
+                        <p:outputLabel for="lastName"
+                                       value="Επώνυμο"/>
 
-                <br/><br/>
+                        <p:inputText id="lastName"
+                                     value="#{loginController.lastName}"
+                                     required="true"
+                                     requiredMessage="Το επώνυμο είναι υποχρεωτικό."
+                                     style="width:100%"/>
 
-                <p:outputLabel for="registerPassword"
-                               value="Κωδικός"/>
+                    </div>
 
-                <p:password id="registerPassword"
-                            value="#{loginController.registerPassword}"
-                            required="true"
-                            requiredMessage="Ο κωδικός είναι υποχρεωτικός."
-                            feedback="true"
-                            style="width:100%"/>
+                    <div class="dialog-comment-wrap">
 
-                <br/><br/>
+                        <p:outputLabel for="registerEmail"
+                                       value="Email"/>
 
-                <p:commandButton value="Εγγραφή"
-                                 action="#{loginController.register}"
-                                 update="@form"
-                                 icon="pi pi-user-plus"
-                                 style="width:100%"/>
+                        <p:inputText id="registerEmail"
+                                     value="#{loginController.registerEmail}"
+                                     required="true"
+                                     requiredMessage="Το email είναι υποχρεωτικό."
+                                     style="width:100%"/>
 
-            </p:panel>
+                    </div>
 
-        </h:form>
+                    <div class="dialog-comment-wrap">
+
+                        <p:outputLabel for="registerPassword"
+                                       value="Κωδικός"/>
+
+                        <p:password id="registerPassword"
+                                    value="#{loginController.registerPassword}"
+                                    required="true"
+                                    requiredMessage="Ο κωδικός είναι υποχρεωτικός."
+                                    feedback="true"
+                                    style="width:100%"/>
+
+                        <small class="text-muted">
+
+                            Ο κωδικός πρέπει να περιέχει τουλάχιστον
+                            8 χαρακτήρες,
+                            ένα κεφαλαίο γράμμα,
+                            ένα πεζό γράμμα
+                            και έναν αριθμό.
+
+                        </small>
+
+                    </div>
+
+                    <div class="dialog-comment-wrap">
+
+                        <p:outputLabel for="confirmPassword"
+                                       value="Επιβεβαίωση Κωδικού"/>
+
+                        <p:password id="confirmPassword"
+                                    value="#{loginController.confirmPassword}"
+                                    required="true"
+                                    requiredMessage="Η επιβεβαίωση κωδικού είναι υποχρεωτική."
+                                    feedback="false"
+                                    style="width:100%"/>
+
+                    </div>
+
+                    <p:commandButton value="Εγγραφή"
+                                     action="#{loginController.register}"
+                                     update="@form"
+                                     icon="pi pi-user-plus"
+                                     style="width:100%"/>
+
+                </h:form>
+
+                <div class="section-divider"></div>
+
+                <p class="text-muted mb-0"
+                   style="text-align:center;">
+
+                    Έχετε ήδη λογαριασμό;
+
+                    <h:outputLink value="#{request.contextPath}/login.xhtml"
+                                  styleClass="text-orange fw-bold">
+                        Κάντε σύνδεση
+                    </h:outputLink>
+
+                </p>
+
+            </div>
+
+        </div>
 
     </div>
 

@@ -65,10 +65,10 @@ public class LoginController implements Serializable {
         String role = loggedInUser.getRole().getRoleName();
 
         if ("MANAGER".equals(role)) {
-            return "/faces/manager/requests.xhtml?faces-redirect=true";
+            return "/manager/requests.xhtml?faces-redirect=true";
         }
 
-        return "/faces/employee/dashboard.xhtml?faces-redirect=true";
+        return "/employee/dashboard.xhtml?faces-redirect=true";
     }
 
     public String register() {
@@ -102,7 +102,7 @@ public class LoginController implements Serializable {
                     "Υπάρχει ήδη λογαριασμός με αυτό το email. Παρακαλώ κάντε σύνδεση.");
 
             clearRegisterForm();
-            return "/faces/login.xhtml?faces-redirect=true";
+            return "/login.xhtml?faces-redirect=true";
         }
 
         try {
@@ -114,7 +114,7 @@ public class LoginController implements Serializable {
             addMessage(FacesMessage.SEVERITY_INFO,
                     "Η εγγραφή ολοκληρώθηκε. Μπορείς να συνδεθείς.");
 
-            return "/faces/login.xhtml?faces-redirect=true";
+            return "/login.xhtml?faces-redirect=true";
 
         } catch (IllegalArgumentException e) {
             addMessage(FacesMessage.SEVERITY_ERROR, e.getMessage());
@@ -130,8 +130,7 @@ public class LoginController implements Serializable {
                 .getExternalContext()
                 .invalidateSession();
 
-        return "/faces/login.xhtml?faces-redirect=true";
-    }
+        return "/login.xhtml?faces-redirect=true";    }
 
     private boolean isValidEmail(String email) {
         return email != null && EMAIL_PATTERN.matcher(email).matches();

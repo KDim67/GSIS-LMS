@@ -1,47 +1,110 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="jakarta.faces.html"
-                xmlns:f="jakarta.faces.core"
                 xmlns:ui="jakarta.faces.facelets"
                 xmlns:p="http://primefaces.org/ui">
 
-    <!-- Top Branding Row -->
     <div class="header-top">
+
         <div class="header-brand">
-            <h:graphicImage name="images/gsis_logo.png" alt="GSIS Logo" styleClass="logo-image" />
+            <h:graphicImage name="images/gsis_logo.png"
+                            alt="GSIS Logo"
+                            styleClass="logo-image" />
+
             <div class="header-titles">
                 <h2>Σύστημα Διαχείρισης Αδειών</h2>
+                <span>Γενική Γραμματεία Πληροφοριακών Συστημάτων</span>
             </div>
         </div>
+
         <div class="header-right">
-            <span class="header-badge">
-                <i class="pi pi-user" style="margin-right:5px;"></i>
-                #{sessionController.currentUser.firstName} #{sessionController.currentUser.lastName}
-            </span>
-            <p:commandButton value="Αποσύνδεση" icon="pi pi-sign-out"
-                             action="#{sessionController.logout}"
-                             styleClass="btn-export"
-                             style="margin:0;" />
+
+            <h:panelGroup rendered="#{empty loginController.loggedInUser}">
+                <span class="header-badge">
+                    <i class="pi pi-lock" style="margin-right:5px;"></i>
+                    Δημόσια Πρόσβαση
+                </span>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{not empty loginController.loggedInUser}">
+                <span class="header-badge">
+                    <i class="pi pi-user" style="margin-right:5px;"></i>
+                    #{loginController.loggedInUser.firstName}
+                    #{loginController.loggedInUser.lastName}
+                </span>
+
+                <h:form id="logoutForm">
+                    <p:commandButton value="Αποσύνδεση"
+                                     icon="pi pi-sign-out"
+                                     action="#{loginController.logout}"
+                                     styleClass="btn-export"
+                                     style="margin:0;" />
+                </h:form>
+            </h:panelGroup>
+
         </div>
+
     </div>
 
-    <!-- Navigation Bar -->
     <div class="layout-navbar">
         <div class="nav-container">
-            <p:link outcome="/manager/stats.xhtml"
-                    styleClass="nav-item #{request.servletPath.contains('stats') ? 'active' : ''}">
-                <i class="pi pi-chart-bar"></i>
-                <span>Dashboard</span>
-            </p:link>
-            <p:link outcome="/manager/requests.xhtml"
-                    styleClass="nav-item #{request.servletPath.contains('requests') ? 'active' : ''}">
-                <i class="pi pi-list"></i>
-                <span>Αιτήματα Άδειας</span>
-            </p:link>
-            <p:link outcome="/manager/audit.xhtml"
-                    styleClass="nav-item #{request.servletPath.contains('audit') ? 'active' : ''}">
-                <i class="pi pi-history"></i>
-                <span>Αρχείο Ελέγχου</span>
-            </p:link>
+
+            <!-- Guest menu -->
+            <h:panelGroup rendered="#{empty loginController.loggedInUser}">
+
+                <h:outputLink value="#{request.contextPath}/login.xhtml"
+                              styleClass="nav-item #{request.servletPath.contains('login') ? 'active' : ''}">
+                    <i class="pi pi-sign-in"></i>
+                    <span>Σύνδεση</span>
+                </h:outputLink>
+
+                <h:outputLink value="#{request.contextPath}/register.xhtml"
+                              styleClass="nav-item #{request.servletPath.contains('register') ? 'active' : ''}">
+                    <i class="pi pi-user-plus"></i>
+                    <span>Εγγραφή</span>
+                </h:outputLink>
+
+            </h:panelGroup>
+
+            <!-- Manager menu -->
+            <h:panelGroup rendered="#{loginController.loggedInUserRole eq 'MANAGER'}">
+
+                <h:outputLink value="#{request.contextPath}/manager/stats.xhtml"
+                              styleClass="nav-item #{request.servletPath.contains('stats') ? 'active' : ''}">
+                    <i class="pi pi-chart-bar"></i>
+                    <span>Επισκόπηση</span>
+                </h:outputLink>
+
+                <h:outputLink value="#{request.contextPath}/manager/requests.xhtml"
+                              styleClass="nav-item #{request.servletPath.contains('requests') ? 'active' : ''}">
+                    <i class="pi pi-list"></i>
+                    <span>Αιτήματα Άδειας</span>
+                </h:outputLink>
+
+                <h:outputLink value="#{request.contextPath}/manager/audit.xhtml"
+                              styleClass="nav-item #{request.servletPath.contains('audit') ? 'active' : ''}">
+                    <i class="pi pi-history"></i>
+                    <span>Αρχείο Ελέγχου</span>
+                </h:outputLink>
+
+            </h:panelGroup>
+
+            <!-- Employee menu -->
+            <h:panelGroup rendered="#{loginController.loggedInUserRole eq 'EMPLOYEE'}">
+
+                <h:outputLink value="#{request.contextPath}/employee/dashboard.xhtml"
+                              styleClass="nav-item #{request.servletPath.contains('dashboard') ? 'active' : ''}">
+                    <i class="pi pi-home"></i>
+                    <span>Dashboard</span>
+                </h:outputLink>
+
+                <h:outputLink value="#{request.contextPath}/employee/history.xhtml"
+                              styleClass="nav-item #{request.servletPath.contains('history') ? 'active' : ''}">
+                    <i class="pi pi-calendar"></i>
+                    <span>Ιστορικό Αδειών</span>
+                </h:outputLink>
+
+            </h:panelGroup>
+
         </div>
     </div>
 

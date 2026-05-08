@@ -1,129 +1,103 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
 
 <h:head>
-    <title>Login - Leave Management System</title>
+    <title>Σύνδεση - Leave Management System</title>
 
-    <style>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0"/>
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 0;
-        }
-
-        .top-bar {
-            background-color: #0188ca;
-            color: white;
-            padding: 18px;
-            text-align: center;
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .auth-container {
-            width: 420px;
-            margin: 60px auto;
-        }
-
-        .auth-menu {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .auth-link {
-            margin: 0 10px;
-            color: #0188ca;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .auth-link:hover {
-            color: #ed5929;
-        }
-
-        .ui-panel-titlebar {
-            background: #0188ca !important;
-            color: white !important;
-            border: none !important;
-        }
-
-        .ui-button {
-            background: #ed5929 !important;
-            border: none !important;
-        }
-
-        .ui-button:hover {
-            background: #d94f22 !important;
-        }
-
-    </style>
-
+    <h:outputStylesheet library="css"
+                        name="style.css"/>
 </h:head>
 
 <h:body>
 
-    <div class="top-bar">
-        Γενική Γραμματεία Πληροφοριακών Συστημάτων
-    </div>
+    <ui:include src="/WEB-INF/template/header.xhtml"/>
 
-    <div class="auth-container">
+    <div class="container">
 
-        <div class="auth-menu">
-
-            <h:link outcome="/login.xhtml"
-                    value="Login"
-                    styleClass="auth-link"/>
-
-            <h:link outcome="/register.xhtml"
-                    value="Register"
-                    styleClass="auth-link"/>
-
+        <div class="page-header">
+            <h2>
+                <i class="pi pi-lock"></i>
+                Σύνδεση Χρήστη
+            </h2>
         </div>
 
-        <h:form id="loginForm">
+        <div class="card"
+             style="max-width: 480px; margin: 0 auto;">
 
-            <p:growl id="messages"
-                     showDetail="true"
-                     life="4000"/>
+            <div class="card-header">
+                <h3>
+                    <i class="pi pi-id-card"></i>
+                    Είσοδος στο σύστημα
+                </h3>
+            </div>
 
-            <p:panel header="Σύνδεση Χρήστη">
+            <div class="card-body">
 
-                <p:outputLabel for="email"
-                               value="Email"/>
+                <h:form id="loginForm">
 
-                <p:inputText id="email"
-                             value="#{loginController.email}"
-                             required="true"
-                             requiredMessage="Το email είναι υποχρεωτικό."
-                             style="width:100%"/>
+                    <p:growl id="messages"
+                             showDetail="true"
+                             life="4000"/>
 
-                <br/><br/>
+                    <div class="dialog-comment-wrap">
 
-                <p:outputLabel for="password"
-                               value="Κωδικός"/>
+                        <p:outputLabel for="email"
+                                       value="Email"/>
 
-                <p:password id="password"
-                            value="#{loginController.password}"
-                            required="true"
-                            requiredMessage="Ο κωδικός είναι υποχρεωτικός."
-                            feedback="false"
-                            style="width:100%"/>
+                        <p:inputText id="email"
+                                     value="#{loginController.email}"
+                                     required="true"
+                                     requiredMessage="Το email είναι υποχρεωτικό."
+                                     style="width:100%"/>
 
-                <br/><br/>
+                    </div>
 
-                <p:commandButton value="Σύνδεση"
-                                 action="#{loginController.login}"
-                                 update="@form"
-                                 icon="pi pi-sign-in"
-                                 style="width:100%"/>
+                    <div class="dialog-comment-wrap">
 
-            </p:panel>
+                        <p:outputLabel for="password"
+                                       value="Κωδικός"/>
 
-        </h:form>
+                        <p:password id="password"
+                                    value="#{loginController.password}"
+                                    required="true"
+                                    requiredMessage="Ο κωδικός είναι υποχρεωτικός."
+                                    feedback="false"
+                                    style="width:100%"/>
+
+                    </div>
+
+                    <p:commandButton value="Σύνδεση"
+                                     action="#{loginController.login}"
+                                     update="@form"
+                                     icon="pi pi-sign-in"
+                                     styleClass="btn-primary"
+                                     style="width:100%"/>
+
+                </h:form>
+
+                <div class="section-divider"></div>
+
+                <p class="text-muted mb-0"
+                   style="text-align:center;">
+
+                    Δεν έχετε λογαριασμό;
+
+                    <h:outputLink value="#{request.contextPath}/register.xhtml"
+                                  styleClass="text-orange fw-bold">
+                        Κάντε εγγραφή
+                    </h:outputLink>
+
+                </p>
+
+            </div>
+
+        </div>
 
     </div>
 
