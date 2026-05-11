@@ -9,7 +9,7 @@ import com.company.lms.util.GreekHolidayUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
+import com.company.lms.util.GreekHolidayUtil;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
@@ -82,23 +82,6 @@ public class EmployeeLeaveService {
     }
 
     public int calculateWorkingDays(LocalDate startDate, LocalDate endDate) {
-        int workingDays = 0;
-        LocalDate currentDate = startDate;
-        int cachedYear = -1;
-        Set<LocalDate> holidays = null;
-
-        while (!currentDate.isAfter(endDate)) {
-            if (currentDate.getYear() != cachedYear) {
-                cachedYear = currentDate.getYear();
-                holidays = GreekHolidayUtil.getHolidays(cachedYear);
-            }
-            DayOfWeek dow = currentDate.getDayOfWeek();
-            if (dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY && !holidays.contains(currentDate)) {
-                workingDays++;
-            }
-            currentDate = currentDate.plusDays(1);
-        }
-
-        return workingDays;
+        return GreekHolidayUtil.calculateWorkingDays(startDate, endDate);
     }
 }

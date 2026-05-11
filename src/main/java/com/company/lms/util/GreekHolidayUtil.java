@@ -1,5 +1,6 @@
 package com.company.lms.util;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,5 +38,41 @@ public class GreekHolidayUtil {
         int month = (d + e + 114) / 31;
         int day = ((d + e + 114) % 31) + 1;
         return LocalDate.of(year, month, day).plusDays(13);
+    }
+
+    public static int calculateWorkingDays(LocalDate startDate, LocalDate endDate) {
+
+        if (startDate == null || endDate == null) {
+            return 0;
+        }
+
+        if (endDate.isBefore(startDate)) {
+            return 0;
+        }
+
+        int workingDays = 0;
+        LocalDate currentDate = startDate;
+        int cachedYear = -1;
+        Set<LocalDate> holidays = null;
+
+        while (!currentDate.isAfter(endDate)) {
+
+            if (currentDate.getYear() != cachedYear) {
+                cachedYear = currentDate.getYear();
+                holidays = GreekHolidayUtil.getHolidays(cachedYear);
+            }
+
+            DayOfWeek dow = currentDate.getDayOfWeek();
+
+            if (dow != DayOfWeek.SATURDAY
+                    && dow != DayOfWeek.SUNDAY
+                    && !holidays.contains(currentDate)) {
+                workingDays++;
+            }
+
+            currentDate = currentDate.plusDays(1);
+        }
+
+        return workingDays;
     }
 }

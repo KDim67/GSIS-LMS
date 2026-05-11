@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import com.company.lms.util.GreekHolidayUtil;
 
 @Entity
 @Table(name = "leaves")
@@ -71,4 +72,8 @@ public class LeaveRequest implements Serializable {
 
     public LeaveStatus getStatus() { return status; }
     public void setStatus(LeaveStatus status) { this.status = status; }
+
+    public int getWorkingDays() {
+        return GreekHolidayUtil.calculateWorkingDays(startDate, endDate);
+    }
 }
