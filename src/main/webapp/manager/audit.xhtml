@@ -14,18 +14,16 @@
                     <i class="pi pi-history"></i>
                     Αρχείο Ελέγχου Συστήματος
                 </h2>
+
                 <div class="toolbar-right">
-                    <p:commandButton value="Εξαγωγή CSV"
+                    <p:commandButton value="Εξαγωγή Excel"
                                      icon="pi pi-download"
-                                     styleClass="btn-export">
-                        <p:dataExporter type="csv"
-                                        target="auditTable"
-                                        fileName="audit_logs_#{now}" />
-                    </p:commandButton>
+                                     styleClass="btn-export"
+                                     action="#{auditController.exportHtmlExcel}"
+                                     ajax="false" />
                 </div>
             </div>
 
-            <!-- Audit DataTable -->
             <p:dataTable id="auditTable"
                          value="#{auditController.auditLogs}"
                          var="log"
@@ -38,8 +36,9 @@
                          sortOrder="DESCENDING"
                          emptyMessage="Δεν βρέθηκαν καταγραφές ελέγχου.">
 
-                <p:column headerText="Ημερομηνία &amp; Ώρα"
+                <p:column headerText="ΗΜΕΡΟΜΗΝΙΑ &amp; ΩΡΑ"
                           sortBy="#{log.timestamp}"
+                          exportValue="#{auditController.exportTimestamp(log)}"
                           style="width:170px;">
                     <span style="display:flex; align-items:center; gap:6px; color:var(--text-sub); font-size:0.875rem;">
                         <i class="pi pi-calendar" style="color:var(--blue);"></i>
@@ -49,10 +48,11 @@
                     </span>
                 </p:column>
 
-                <p:column headerText="Χρήστης"
-                          filterBy="#{log.user.email}"
+                <p:column headerText="ΧΡΗΣΤΗΣ"
+                          filterBy="#{log.user.fullName}"
                           filterMatchMode="contains"
-                          filterPlaceholder="Αναζήτηση...">
+                          filterPlaceholder="Αναζήτηση..."
+                          exportValue="#{auditController.exportUser(log)}">
                     <div style="display:flex; align-items:center; gap:8px;">
                         <span style="width:30px; height:30px; border-radius:50%;
                                      background:var(--blue-light); color:var(--blue);
@@ -64,25 +64,31 @@
                             <div class="fw-bold" style="font-size:0.875rem;">
                                 #{log.user.firstName} #{log.user.lastName}
                             </div>
-                            <div class="text-muted" style="font-size:0.78rem;">#{log.user.email}</div>
+                            <div class="text-muted" style="font-size:0.78rem;">
+                                #{log.user.email}
+                            </div>
                         </div>
                     </div>
                 </p:column>
 
-                <p:column headerText="Ενέργεια"
+                <p:column headerText="ΕΝΕΡΓΕΙΑ"
                           filterBy="#{log.action}"
-                          filterMatchMode="exact"
+                          filterMatchMode="contains"
                           filterPlaceholder="Φιλτράρισμα..."
+                          exportValue="#{auditController.exportAction(log)}"
                           style="width:160px;">
                     <h:panelGroup>
-                        <span class="badge #{log.action == 'APPROVE' ? 'badge-approved' : log.action == 'REJECT' ? 'badge-rejected' : 'badge-pending'}">
+                        <span class="badge #{log.action == 'APPROVE' ? 'badge-approved' : log.action == 'REJECT' ? 'badge-rejected' : 'badge-pending'}"
+                              style="text-transform:none;">
                             <i class="pi #{log.action == 'APPROVE' ? 'pi-check' : log.action == 'REJECT' ? 'pi-times' : 'pi-pencil'}"></i>
                             #{log.action}
                         </span>
                     </h:panelGroup>
                 </p:column>
 
-                <p:column headerText="Αναγνωριστικό" style="width:150px;">
+                <p:column headerText="ΑΝΑΓΝΩΡΙΣΤΙΚΟ"
+                          exportValue="#{auditController.exportTargetId(log)}"
+                          style="width:150px;">
                     <span style="font-family: monospace; color:var(--blue); font-weight:600;
                                  background:var(--blue-light); padding:2px 8px;
                                  border-radius:4px; font-size:0.85rem;">
@@ -90,8 +96,10 @@
                     </span>
                 </p:column>
 
-                <p:column headerText="Σχόλιο">
-                    <h:outputText value="#{log.comment}" style="color:var(--text-sub); font-size:0.875rem;" />
+                <p:column headerText="ΣΧΟΛΙΟ"
+                          exportValue="#{auditController.exportComment(log)}">
+                    <h:outputText value="#{log.comment}"
+                                  style="color:var(--text-sub); font-size:0.875rem;" />
                 </p:column>
 
             </p:dataTable>
