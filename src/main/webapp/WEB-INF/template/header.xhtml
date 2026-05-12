@@ -12,7 +12,6 @@
 
             <div class="header-titles">
                 <h2>Σύστημα Διαχείρισης Αδειών</h2>
-                <span>Γενική Γραμματεία Πληροφοριακών Συστημάτων</span>
             </div>
         </div>
 
@@ -54,13 +53,13 @@
                 <h:outputLink value="#{request.contextPath}/login.xhtml"
                               styleClass="nav-item #{request.servletPath.contains('login') ? 'active' : ''}">
                     <i class="pi pi-sign-in"></i>
-                    <span>Σύνδεση</span>
+                    <span>ΣΥΝΔΕΣΗ</span>
                 </h:outputLink>
 
                 <h:outputLink value="#{request.contextPath}/register.xhtml"
                               styleClass="nav-item #{request.servletPath.contains('register') ? 'active' : ''}">
                     <i class="pi pi-user-plus"></i>
-                    <span>Εγγραφή</span>
+                    <span>ΕΓΓΡΑΦΗ</span>
                 </h:outputLink>
 
             </h:panelGroup>
@@ -71,19 +70,31 @@
                 <h:outputLink value="#{request.contextPath}/manager/stats.xhtml"
                               styleClass="nav-item #{request.servletPath.contains('stats') ? 'active' : ''}">
                     <i class="pi pi-chart-bar"></i>
-                    <span>Επισκόπηση</span>
+                    <span>ΕΠΙΣΚΟΠΗΣΗ</span>
                 </h:outputLink>
 
                 <h:outputLink value="#{request.contextPath}/manager/requests.xhtml"
-                              styleClass="nav-item #{request.servletPath.contains('requests') ? 'active' : ''}">
+                              styleClass="nav-item #{request.servletPath.contains('/manager/requests') ? 'active' : ''}">
                     <i class="pi pi-list"></i>
-                    <span>Αιτήματα Άδειας</span>
+                    <span>ΑΙΤΗΜΑΤΑ ΑΔΕΙΑΣ</span>
                 </h:outputLink>
 
                 <h:outputLink value="#{request.contextPath}/manager/audit.xhtml"
                               styleClass="nav-item #{request.servletPath.contains('audit') ? 'active' : ''}">
                     <i class="pi pi-history"></i>
-                    <span>Αρχείο Ελέγχου</span>
+                    <span>ΑΡΧΕΙΟ ΕΛΕΓΧΟΥ</span>
+                </h:outputLink>
+
+                <h:outputLink value="#{request.contextPath}/employee/dashboard.xhtml"
+                              styleClass="nav-item #{request.servletPath.contains('/employee/dashboard') ? 'active' : ''}">
+                    <i class="pi pi-send"></i>
+                    <span>ΝΕΟ ΑΙΤΗΜΑ ΑΔΕΙΑΣ</span>
+                </h:outputLink>
+
+                <h:outputLink value="#{request.contextPath}/employee/history.xhtml"
+                              styleClass="nav-item #{request.servletPath.contains('/employee/history') ? 'active' : ''}">
+                    <i class="pi pi-calendar"></i>
+                    <span>ΙΣΤΟΡΙΚΟ ΑΔΕΙΩΝ</span>
                 </h:outputLink>
 
             </h:panelGroup>
@@ -94,13 +105,13 @@
                 <h:outputLink value="#{request.contextPath}/employee/dashboard.xhtml"
                               styleClass="nav-item #{request.servletPath.contains('/employee/dashboard') ? 'active' : ''}">
                     <i class="pi pi-send"></i>
-                    <span>Νέο Αίτημα Άδειας</span>
+                    <span>ΝΕΟ ΑΙΤΗΜΑ ΑΔΕΙΑΣ</span>
                 </h:outputLink>
 
                 <h:outputLink value="#{request.contextPath}/employee/history.xhtml"
                               styleClass="nav-item #{request.servletPath.contains('/employee/history') ? 'active' : ''}">
                     <i class="pi pi-history"></i>
-                    <span>Ιστορικό Αδειών</span>
+                    <span>ΙΣΤΟΡΙΚΟ ΑΔΕΙΩΝ</span>
                 </h:outputLink>
 
             </h:panelGroup>

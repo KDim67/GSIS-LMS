@@ -17,7 +17,7 @@
                 </h2>
                 <span class="badge badge-pending">
                     <i class="pi pi-clock"></i>
-                    #{managerController.pendingRequests.size()} εκκρεμή
+                    #{managerController.pendingRequests.size()} ΕΚΚΡΕΜΗ
                 </span>
             </div>
 
@@ -33,7 +33,7 @@
                          rowsPerPageTemplate="10,20,50"
                          style="margin-top:0;">
 
-                <p:column headerText="Υπάλληλος" sortBy="#{leaveReq.employee.lastName}">
+                <p:column headerText="ΥΠΑΛΛΗΛΟΣ" sortBy="#{leaveReq.employee.lastName}">
                     <div style="display:flex; align-items:center; gap:8px;">
                         <span style="width:32px; height:32px; border-radius:50%;
                                      background:var(--blue-light); color:var(--blue);
@@ -47,31 +47,31 @@
                     </div>
                 </p:column>
 
-                <p:column headerText="Τύπος Άδειας" sortBy="#{leaveReq.leaveType}">
-                    <span class="badge badge-pending">#{leaveReq.leaveType}</span>
+                <p:column headerText="ΤΥΠΟΣ ΑΔΕΙΑΣ" sortBy="#{leaveReq.leaveType}">
+                    <span class="badge badge-pending" style="text-transform:none;">#{leaveReq.leaveType}</span>
                 </p:column>
 
-                <p:column headerText="Από" sortBy="#{leaveReq.startDate}">
+                <p:column headerText="ΑΠΟ" sortBy="#{leaveReq.startDate}">
                     <h:outputText value="#{leaveReq.startDate}">
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="Έως" sortBy="#{leaveReq.endDate}">
+                <p:column headerText="ΕΩΣ" sortBy="#{leaveReq.endDate}">
                     <h:outputText value="#{leaveReq.endDate}">
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="Ημέρες" style="text-align:center; width:80px;">
+                <p:column headerText="ΗΜΕΡΕΣ" style="text-align:center; width:80px;">
                     <span class="fw-bold text-blue">#{leaveReq.workingDays}</span>
                 </p:column>
 
-                <p:column headerText="Αιτιολόγηση">
+                <p:column headerText="ΑΙΤΙΟΛΟΓΗΣΗ">
                     <h:outputText value="#{leaveReq.reason}" style="color:var(--text-sub);" />
                 </p:column>
 
-                <p:column headerText="Ενέργειες" style="width:290px; text-align:center;">
+                <p:column headerText="ΕΝΕΡΓΕΙΕΣ" style="width:290px; text-align:center;">
                     <div class="table-actions">
                         <p:commandButton icon="pi pi-check"
                                          value="Έγκριση"
@@ -121,13 +121,13 @@
 
                         <div style="background:var(--bg); border-radius:var(--radius); padding:12px 14px; margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.875rem;">
                             <div>
-                                <span class="text-muted" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.4px; font-weight:700; display:block;">Από</span>
+                                <span class="text-muted" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.4px; font-weight:700; display:block;">ΑΠΟ</span>
                                 <h:outputText value="#{managerController.selectedRequest.startDate}">
                                     <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                                 </h:outputText>
                             </div>
                             <div>
-                                <span class="text-muted" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.4px; font-weight:700; display:block;">Έως</span>
+                                <span class="text-muted" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.4px; font-weight:700; display:block;">ΕΩΣ</span>
                                 <h:outputText value="#{managerController.selectedRequest.endDate}">
                                     <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                                 </h:outputText>
@@ -135,8 +135,8 @@
                         </div>
 
                         <div class="dialog-comment-wrap">
-                            <label>Σχόλιο Διαχειριστή
-                                <span class="text-muted">(απαιτείται για απόρριψη)</span>
+                            <label>ΣΧΟΛΙΟ ΔΙΑΧΕΙΡΙΣΤΗ
+                                <span class="text-muted">(ΑΠΑΙΤΕΙΤΑΙ ΓΙΑ ΑΠΟΡΡΙΨΗ</span>
                             </label>
                             <p:inputTextarea rows="4" style="width:100%;" placeholder="Προσθέστε σχόλιο..." value="#{managerController.managerComment}" />
                         </div>
