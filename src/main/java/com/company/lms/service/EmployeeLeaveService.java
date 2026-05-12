@@ -40,6 +40,12 @@ public class EmployeeLeaveService {
             throw new IllegalArgumentException("Ο υπάλληλος δεν βρέθηκε.");
         }
 
+        if (employee.getManager() == null) {
+            throw new IllegalStateException(
+                    "Δεν μπορείτε να υποβάλετε αίτηση άδειας, επειδή δεν έχει οριστεί προϊστάμενος για τον λογαριασμό σας."
+            );
+        }
+
         if (startDate == null || endDate == null) {
             throw new IllegalArgumentException("Παρακαλώ επιλέξτε ημερομηνία έναρξης και λήξης.");
         }

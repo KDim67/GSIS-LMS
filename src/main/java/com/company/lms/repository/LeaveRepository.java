@@ -34,6 +34,20 @@ public class LeaveRepository {
                 .getResultList();
     }
 
+    public List<LeaveRequest> findPendingByManagerId(Integer managerId) {
+        return em.createQuery(
+                        "SELECT l FROM LeaveRequest l " +
+                                "JOIN FETCH l.employee e " +
+                                "WHERE l.status = :status " +
+                                "AND e.manager.id = :managerId " +
+                                "ORDER BY l.startDate ASC",
+                        LeaveRequest.class
+                )
+                .setParameter("status", LeaveStatus.PENDING)
+                .setParameter("managerId", managerId)
+                .getResultList();
+    }
+
     public boolean existsOverlappingRequest(Integer employeeId, LocalDate startDate, LocalDate endDate) {
         Long count = em.createQuery(
                 "SELECT COUNT(l) FROM LeaveRequest l WHERE l.employee.id = :employeeId " +
