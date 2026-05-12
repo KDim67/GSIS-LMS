@@ -29,8 +29,12 @@ public class ManagerLeaveService {
     private AuditService auditService;
 
     // Returns all leaves with PENDING status.
-    public List<LeaveRequest> getPendingRequests() {
-        return leaveRepo.findByStatus(LeaveStatus.PENDING);
+    public List<LeaveRequest> getPendingRequests(Employee manager) {
+        if (manager == null) {
+            throw new IllegalStateException("Απαιτείται σύνδεση διαχειριστή.");
+        }
+
+        return leaveRepo.findPendingByManagerId(manager.getId());
     }
 
     // Changes the status, reduces the balance, and logs to Audit.
@@ -42,6 +46,8 @@ public class ManagerLeaveService {
         if (request == null || request.getStatus() != LeaveStatus.PENDING) {
             throw new IllegalArgumentException("Το αίτημα δεν βρέθηκε ή έχει ήδη επεξεργαστεί.");
         }
+
+        validateManagerCanHandleRequest(request, manager);
 
         // 1. Update the request
         request.setStatus(LeaveStatus.APPROVED);
@@ -73,6 +79,8 @@ public class ManagerLeaveService {
             throw new IllegalArgumentException("Το αίτημα δεν βρέθηκε ή έχει ήδη επεξεργαστεί.");
         }
 
+        validateManagerCanHandleRequest(request, manager);
+
         // 1. Update the request
         request.setStatus(LeaveStatus.REJECTED);
         request.setManagerComment(comment);
@@ -102,5 +110,21 @@ public class ManagerLeaveService {
             currentDate = currentDate.plusDays(1);
         }
         return workingDays;
+    }
+
+    private void validateManagerCanHandleRequest(LeaveRequest request, Employee manager) {
+
+        if (manager == null) {
+            throw new IllegalStateException("Απαιτείται σύνδεση διαχειριστή.");
+        }
+
+        if (request.getEmployee().getId().equals(manager.getId())) {
+            throw new IllegalStateException("Δεν μπορείτε να διαχειριστείτε δικό σας αίτημα άδειας.");
+        }
+
+        if (request.getEmployee().getManager() == null ||
+                !request.getEmployee().getManager().getId().equals(manager.getId())) {
+            throw new IllegalStateException("Δεν έχετε δικαίωμα διαχείρισης αυτού του αιτήματος.");
+        }
     }
 }

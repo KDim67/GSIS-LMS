@@ -33,7 +33,14 @@ public class ManagerController implements Serializable {
     }
 
     private void loadRequests() {
-        pendingRequests = managerService.getPendingRequests();
+        Employee currentManager = loginController.getLoggedInUser();
+
+        if (currentManager == null) {
+            pendingRequests = List.of();
+            return;
+        }
+
+        pendingRequests = managerService.getPendingRequests(currentManager);
     }
 
     public void approveLeave() {

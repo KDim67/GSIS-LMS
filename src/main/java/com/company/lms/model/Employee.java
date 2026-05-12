@@ -30,6 +30,10 @@ public class Employee implements Serializable {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_id")
+    private Employee manager;
+
     public Employee() {}
 
     // Getters and Setters
@@ -53,4 +57,12 @@ public class Employee implements Serializable {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+
+    public Employee getManager() {
+        return manager;
+    }
+
+    public void setManager(Employee manager) {
+        this.manager = manager;
+    }
 }
