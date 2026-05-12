@@ -71,25 +71,26 @@
                     <h:outputText value="#{leaveReq.reason}" style="color:var(--text-sub);" />
                 </p:column>
 
-                <p:column headerText="Ενέργειες" style="width:200px; text-align:center;">
-                    <p:commandButton icon="pi pi-check"
-                                     value="Έγκριση"
-                                     styleClass="btn-approve"
-                                     style="margin-right:8px;"
-                                     update=":dialogForm:actionDialogPanel"
-                                     oncomplete="PF('actionDialog').show()">
-                        <f:setPropertyActionListener value="#{leaveReq}" target="#{managerController.selectedRequest}" />
-                        <f:setPropertyActionListener value="APPROVE" target="#{managerController.pendingAction}" />
-                    </p:commandButton>
+                <p:column headerText="Ενέργειες" style="width:290px; text-align:center;">
+                    <div class="table-actions">
+                        <p:commandButton icon="pi pi-check"
+                                         value="Έγκριση"
+                                         styleClass="btn-approve"
+                                         update=":dialogForm:actionDialogPanel"
+                                         oncomplete="PF('actionDialog').show()">
+                            <f:setPropertyActionListener value="#{leaveReq}" target="#{managerController.selectedRequest}" />
+                            <f:setPropertyActionListener value="APPROVE" target="#{managerController.pendingAction}" />
+                        </p:commandButton>
 
-                    <p:commandButton icon="pi pi-times"
-                                     value="Απόρριψη"
-                                     styleClass="btn-reject"
-                                     update=":dialogForm:actionDialogPanel"
-                                     oncomplete="PF('actionDialog').show()">
-                        <f:setPropertyActionListener value="#{leaveReq}" target="#{managerController.selectedRequest}" />
-                        <f:setPropertyActionListener value="REJECT" target="#{managerController.pendingAction}" />
-                    </p:commandButton>
+                        <p:commandButton icon="pi pi-times"
+                                         value="Απόρριψη"
+                                         styleClass="btn-reject"
+                                         update=":dialogForm:actionDialogPanel"
+                                         oncomplete="PF('actionDialog').show()">
+                            <f:setPropertyActionListener value="#{leaveReq}" target="#{managerController.selectedRequest}" />
+                            <f:setPropertyActionListener value="REJECT" target="#{managerController.pendingAction}" />
+                        </p:commandButton>
+                    </div>
                 </p:column>
 
             </p:dataTable>

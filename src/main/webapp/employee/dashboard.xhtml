@@ -110,8 +110,10 @@
 
                             <div>
                                 <p:outputLabel value="Εργάσιμες Ημέρες" />
-                                <h:panelGroup id="workingDays" layout="block" styleClass="badge badge-pending" style="display:inline-flex; margin-top:8px;">
-                                    #{employeeController.requestedWorkingDays}
+                                <h:panelGroup id="workingDays" layout="block" styleClass="calculated-days-box">
+                                    <i class="pi pi-calendar" style="color: var(--text-muted);"></i>
+                                    <span class="days-number">#{employeeController.requestedWorkingDays}</span>
+                                    <span class="days-label">ημέρες</span>
                                 </h:panelGroup>
                             </div>
 

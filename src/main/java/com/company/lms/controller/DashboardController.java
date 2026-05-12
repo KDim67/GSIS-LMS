@@ -8,8 +8,10 @@ import jakarta.inject.Named;
 import org.primefaces.model.charts.ChartData;
 import org.primefaces.model.charts.bar.BarChartDataSet;
 import org.primefaces.model.charts.bar.BarChartModel;
+import org.primefaces.model.charts.bar.BarChartOptions;
 import org.primefaces.model.charts.pie.PieChartDataSet;
 import org.primefaces.model.charts.pie.PieChartModel;
+import org.primefaces.model.charts.pie.PieChartOptions;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -85,6 +87,10 @@ public class DashboardController implements Serializable {
         data.addChartDataSet(dataSet);
         data.setLabels(labels);
         pieModel.setData(data);
+        
+        PieChartOptions options = new PieChartOptions();
+        options.setMaintainAspectRatio(false);
+        pieModel.setOptions(options);
     }
 
     private void createBarModel() {
@@ -107,6 +113,10 @@ public class DashboardController implements Serializable {
         data.addChartDataSet(barDataSet);
         data.setLabels(labels);
         barModel.setData(data);
+        
+        BarChartOptions options = new BarChartOptions();
+        options.setMaintainAspectRatio(false);
+        barModel.setOptions(options);
     }
 
     public PieChartModel getPieModel() { return pieModel; }
