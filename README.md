@@ -1,252 +1,139 @@
 # GSIS Leave Management System
 
-A Jakarta EE web application for managing employee leave requests.
+A Jakarta EE web application for managing employee leave requests in an enterprise-style environment.
 
-Employees can register, sign in, submit leave requests, and review their leave history. Managers can review pending requests, approve or reject them with comments, view leave statistics, and inspect the audit log.
-
-## Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Configuration](#configuration)
-- [Database Setup](#database-setup)
-- [Build and Deployment](#build-and-deployment)
-- [Application Routes](#application-routes)
-- [Domain Model](#domain-model)
-- [Security Notes](#security-notes)
-- [Development Notes](#development-notes)
-
-## Features
-
-### Employee
-
-- **Registration and login**: Employees can create an account and authenticate with email and password.
-- **Password validation**: New passwords must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.
-- **Leave request submission**: Employees can submit leave requests with date range, leave type, and reason.
-- **Leave balance checks**: Requests are validated against the employee's available annual leave balance.
-- **Leave history**: Employees can view their submitted requests and their statuses.
-- **Overlap prevention**: The system blocks overlapping pending or approved leave requests.
-- **Working-day calculation**: Leave duration excludes weekends and configured Greek public holidays.
-
-### Manager
-
-- **Pending request review**: Managers can view all pending leave requests.
-- **Approval workflow**: Approved requests deduct working days from the employee leave balance.
-- **Rejection workflow**: Rejected requests require a manager comment.
-- **Audit trail**: Approvals and rejections are logged.
-- **Statistics dashboard**: Managers can view charts grouped by leave status and leave type.
+Employees can submit leave requests and view their leave history. Managers can review, approve or reject requests from their assigned employees, view statistics, and inspect the audit log.
 
 ## Tech Stack
 
-- **Language**: Java 21
-- **Backend platform**: Jakarta EE 10
-- **Web framework**: Jakarta Server Faces with Facelets
-- **UI components**: PrimeFaces 13 Jakarta classifier
-- **Dependency injection**: Jakarta CDI
-- **Persistence**: Jakarta Persistence API with JTA
-- **Database**: MySQL
-- **Application server**: Payara Server 7 compatible runtime
-- **Security utility**: jBCrypt
-- **Build tool**: Maven
-- **Packaging**: WAR
+- Java 21
+- Jakarta EE 10
+- JSF / Facelets
+- PrimeFaces
+- CDI
+- JPA
+- MySQL
+- Payara Server
+- Maven
+- BCrypt
 
-## Architecture
+## Main Features
 
-The application follows a layered Jakarta EE structure:
+### Employee
 
-```text
-JSF pages
-  -> Controllers
-  -> Services
-  -> Repositories
-  -> JPA entities
-  -> MySQL
-```
+- Register and sign in
+- Submit leave requests
+- View leave history
+- Track annual leave balance
+- Validation for overlapping leave requests
+- Working day calculation excluding weekends and Greek holidays
 
-- **Controllers** handle JSF view state and user actions.
-- **Services** contain business rules, transactions, leave validation, balance updates, statistics, authentication, and audit logging.
-- **Repositories** encapsulate JPA queries and persistence operations.
-- **Entities** map the relational model used by JPA.
-- **Utilities** provide password hashing and Greek public holiday calculation.
+### Manager
 
-## Project Structure
+- View pending requests only from assigned employees
+- Approve or reject requests with comments
+- View leave statistics
+- View audit log records
+- Export audit log data
+- Submit and view personal leave requests as an employee
 
-```text
-.
-├── pom.xml
-├── README.md
-├── src
-│   └── main
-│       ├── java
-│       │   └── com/company/lms
-│       │       ├── controller
-│       │       ├── model
-│       │       ├── repository
-│       │       ├── service
-│       │       └── util
-│       ├── resources
-│       │   └── META-INF/persistence.xml
-│       └── webapp
-│           ├── employee
-│           ├── manager
-│           ├── resources
-│           │   ├── css
-│           │   └── images
-│           ├── WEB-INF
-│           │   ├── template
-│           │   └── web.xml
-│           ├── login.xhtml
-│           └── register.xhtml
-└── WEB-INF
-```
+## Database
 
-The deployable web application descriptor is `src/main/webapp/WEB-INF/web.xml`.
+The database tables are generated automatically from the JPA entities when the application is deployed to Payara.
 
-## Prerequisites
-
-- **Java**: JDK 21
-- **Maven**: Maven 3.8+
-- **Database**: MySQL 8+
-- **Application server**: Payara Server 7 (Jakarta EE compatible)
-
-## Configuration
-
-### Persistence unit
-
-The JPA persistence unit is defined in:
-
-```text
-src/main/resources/META-INF/persistence.xml
-```
-
-Important values:
-
-- **Persistence unit**: `lmsPU`
-- **Transaction type**: `JTA`
-- **JNDI data source**: `jdbc/lms`
-- **Schema generation**: `jakarta.persistence.schema-generation.database.action=create`
-
-### Web configuration
-
-The active JSF configuration is:
-
-```text
-src/main/webapp/WEB-INF/web.xml
-```
-
-Important values:
-
-- **Faces servlet mapping**: `*.xhtml`
-- **Welcome page**: `login.xhtml`
-- **Session timeout**: 30 minutes
-- **JSF project stage**: `Development`
-
-For production deployments, change `jakarta.faces.PROJECT_STAGE` from `Development` to `Production`.
-
-## Database Setup
-
-Create the application database:
+Required database name:
 
 ```sql
-CREATE DATABASE employee_leaves CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE employee_leaves;
 ```
 
-Create a Payara JDBC connection pool for MySQL and expose it through this JNDI resource:
+After deployment, insert the required roles:
+
+```sql
+INSERT IGNORE INTO roles (role_name)
+VALUES
+('MANAGER'),
+('EMPLOYEE');
+```
+
+To assign a manager to an employee:
+
+```sql
+UPDATE employees
+SET manager_id = 1
+WHERE id = 2;
+```
+
+## Payara Setup
+
+Create a JDBC resource with:
 
 ```text
-jdbc/lms
+JNDI Name: jdbc/lms
+Database: employee_leaves
 ```
 
-The application expects the following JPA-managed tables:
+Recommended MySQL connection properties:
 
-- `roles`
-- `employees`
-- `leaves`
-- `audit_logs`
-
-Before users can register successfully, the `roles` table must contain the employee role:
-
-```sql
-INSERT INTO roles (role_name) VALUES ('EMPLOYEE');
+```text
+allowPublicKeyRetrieval=true
+useSSL=false
+serverTimezone=UTC
 ```
 
-Manager access requires a user whose role is `MANAGER`:
+## Build and Deploy
 
-```sql
-INSERT INTO roles (role_name) VALUES ('MANAGER');
-```
-
-User registration creates `EMPLOYEE` accounts. Manager accounts must be created or assigned at the database level unless an administration feature is added.
-
-## Build and Deployment
-
-Build the WAR:
+Build the project:
 
 ```bash
 mvn clean package
 ```
 
-The generated artifact is:
+Deploy the generated WAR file from:
 
 ```text
 target/leave-management.war
 ```
 
-Deploy the WAR to Payara after configuring the `jdbc/lms` JNDI resource.
-
-When deployed with the configured context root, the application is available at:
+Application URL example:
 
 ```text
 http://localhost:8080/leave-management-system
 ```
 
-## Application Routes
+## Configuration Files
 
-- **Login**: `/login.xhtml`
-- **Register**: `/register.xhtml`
-- **Employee dashboard**: `/employee/dashboard.xhtml`
-- **Employee leave history**: `/employee/history.xhtml`
-- **Manager requests**: `/manager/requests.xhtml`
-- **Manager statistics**: `/manager/stats.xhtml`
-- **Manager audit log**: `/manager/audit.xhtml`
+- `beans.xml`: enables CDI bean discovery.
+- `faces-config.xml`: basic JSF configuration file.
+- `403.xhtml`: forbidden access page, placed under `src/main/webapp/403.xhtml`.
 
-## Domain Model
+## Business Rules
 
-- **Role**: Defines application roles such as `EMPLOYEE` and `MANAGER`.
-- **Employee**: Stores user identity, BCrypt password hash, leave balance, and role.
-- **LeaveRequest**: Stores requested date range, leave type, reason, manager comment, and status.
-- **AuditLog**: Stores manager actions against leave requests.
+- Employees without an assigned manager cannot submit leave requests.
+- Managers can only see requests from employees assigned to them.
+- Managers cannot approve or reject their own leave requests.
+- Leave requests cannot overlap with existing pending or approved requests.
+- Leave duration is calculated using working days, excluding weekends and Greek public holidays.
 
-Leave request statuses:
+## Main Pages
 
-- `PENDING`
-- `APPROVED`
-- `REJECTED`
+```text
+/login.xhtml
+/register.xhtml
+/employee/dashboard.xhtml
+/employee/history.xhtml
+/manager/stats.xhtml
+/manager/requests.xhtml
+/manager/audit.xhtml
+/403.xhtml
+```
 
-## Security Notes
+## Security
 
-- Passwords are hashed with BCrypt using jBCrypt.
-- Login state is stored in a JSF session-scoped controller.
-- The UI renders employee or manager navigation based on the logged-in user's role.
-- Registration always creates users with the `EMPLOYEE` role.
+- Passwords are hashed with BCrypt.
+- Role-based access logic separates employee and manager functionality.
+- Audit logs record manager approval and rejection actions.
 
-## Development Notes
+## Authors
 
-- Business validation for leave requests is implemented in `EmployeeLeaveService`.
-- Manager approval and rejection rules are implemented in `ManagerLeaveService`.
-- Statistics aggregation is implemented through `StatisticsService` and `StatisticsRepository`.
-- Greek public holidays are calculated in `GreekHolidayUtil`.
-- No automated test suite is currently included.
-
-## Key Learning Outcomes
-
-- Enterprise Java architecture
-- Layered application design
-- JPA entity modeling
-- Authentication and authorization
-- Transaction management
-- JSF component-based UI development
-- Business rule implementation
+Developed as part of a university internship / academic software development project.
