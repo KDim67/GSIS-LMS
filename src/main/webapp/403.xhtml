@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title>403 - Δεν επιτρέπεται η πρόσβαση</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <h:outputStylesheet library="css" name="style.css"/>
+</h:head>
+
+<h:body>
+
+    <ui:include src="/WEB-INF/template/header.xhtml"/>
+
+    <div class="container">
+        <div class="card" style="max-width: 650px; margin: 60px auto; text-align: center;">
+            <div class="card-header">
+                <h3>
+                    <i class="pi pi-lock"></i>
+                    Δεν επιτρέπεται η πρόσβαση
+                </h3>
+            </div>
+
+            <div class="card-body">
+                <h1 style="font-size: 4rem; margin: 0; color: var(--orange);">
+                    403
+                </h1>
+
+                <p class="text-muted" style="font-size: 1rem; margin-top: 16px;">
+                    Δεν έχετε δικαίωμα πρόσβασης στη συγκεκριμένη σελίδα.
+                </p>
+
+                <p class="text-muted">
+                    Επιστρέψτε στην αρχική σελίδα του λογαριασμού σας.
+                </p>
+
+                <h:panelGroup rendered="#{loginController.loggedInUserRole eq 'MANAGER'}">
+                    <h:outputLink value="#{request.contextPath}/manager/stats.xhtml"
+                                  styleClass="btn-primary"
+                                  style="display:inline-block; margin-top:16px; text-decoration:none;">
+                        Επιστροφή στην Επισκόπηση
+                    </h:outputLink>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{loginController.loggedInUserRole eq 'EMPLOYEE'}">
+                    <h:outputLink value="#{request.contextPath}/employee/dashboard.xhtml"
+                                  styleClass="btn-primary"
+                                  style="display:inline-block; margin-top:16px; text-decoration:none;">
+                        Επιστροφή στο Αίτημα Άδειας
+                    </h:outputLink>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{empty loginController.loggedInUser}">
+                    <h:outputLink value="#{request.contextPath}/login.xhtml"
+                                  styleClass="btn-primary"
+                                  style="display:inline-block; margin-top:16px; text-decoration:none;">
+                        Σύνδεση
+                    </h:outputLink>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
+
+</h:body>
+</html>
