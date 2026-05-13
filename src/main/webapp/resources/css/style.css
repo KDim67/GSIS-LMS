@@ -353,13 +353,15 @@ body .ui-datatable thead th {
 }
 
 body .ui-datatable .ui-column-title {
-    display: block;
+    display: inline-block;
+    vertical-align: middle;
     background: transparent !important;
-    margin-bottom: 8px;
+    margin-right: 6px;
 }
 
 body .ui-datatable thead th .ui-sortable-column-icon {
     color: rgba(255,255,255,0.7) !important;
+    vertical-align: middle;
 }
 
 body .ui-datatable tbody td {
