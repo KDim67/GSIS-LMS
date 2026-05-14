@@ -134,6 +134,15 @@ http://localhost:8080/leave-management-system
 - Role-based access logic separates employee and manager functionality.
 - Audit logs record manager approval and rejection actions.
 
+## Email Notifications
+
+The application supports SMTP email notifications for:
+- new user registration
+- leave request submission
+- leave request approval
+- leave request rejection
+
+Email credentials are not stored in the source code. SMTP settings are configured through Payara JVM Options.
 ## Authors
 
 Developed as part of a university internship / academic software development project.
