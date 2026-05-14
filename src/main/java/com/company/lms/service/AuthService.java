@@ -6,6 +6,7 @@ import com.company.lms.model.LeaveType;
 import com.company.lms.model.Role;
 import com.company.lms.util.PasswordUtil;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -13,6 +14,9 @@ import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class AuthService {
+
+    @Inject
+    private EmailService emailService;
 
     @PersistenceContext(unitName = "lmsPU")
     private EntityManager em;
@@ -55,6 +59,7 @@ public class AuthService {
         employee.setLastName(lastName);
         employee.setEmail(email);
         employee.setPassword(PasswordUtil.hashPassword(password));
+        employee.setAnnualLeaveBalance(20);
         employee.setRole(employeeRole);
 
         em.persist(employee);
@@ -62,6 +67,8 @@ public class AuthService {
         for (LeaveType type : LeaveType.values()) {
             em.persist(new LeaveBalance(employee, type.getDisplayName(), type.getDefaultBalance()));
         }
+
+        emailService.sendWelcomeEmail(employee);
     }
 
     public boolean emailExists(String email) {

@@ -32,6 +32,9 @@ public class ManagerLeaveService {
     @Inject
     private AuditService auditService;
 
+    @Inject
+    private EmailService emailService;
+
     // Returns all leaves with PENDING status.
     public List<LeaveRequest> getPendingRequests(Employee manager) {
         if (manager == null) {
@@ -65,6 +68,8 @@ public class ManagerLeaveService {
         if (updatedRows != 1) {
             throw new IllegalStateException("Ο υπάλληλος δεν έχει επαρκή υπολειπόμενη άδεια (τύπος: #{request.getLeaveType()}).");
         }
+        
+        employee.setAnnualLeaveBalance(employee.getAnnualLeaveBalance() - workingDays);
 
         // 3. Log to Audit (Updated action string and passed comment)
         auditService.logAction(manager, "APPROVE", request.getId(), comment);
@@ -134,6 +139,9 @@ public class ManagerLeaveService {
 
     public int getTeamRemainingBalance(Employee manager) {
         return leaveBalanceRepo.sumTotalForManager(manager.getId());
+        employeeRepo.update(employee);
+
+        emailService.sendLeaveApprovedEmailToEmployee(employee, request);
     }
 
     @Transactional
@@ -155,6 +163,8 @@ public class ManagerLeaveService {
         
         // 3. Save changes
         leaveRepo.update(request);
+
+        emailService.sendLeaveRejectedEmailToEmployee(request.getEmployee(), request);
     }
 
     private int calculateWorkingDays(LocalDate startDate, LocalDate endDate) {

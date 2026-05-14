@@ -18,6 +18,9 @@ import java.util.List;
 public class EmployeeLeaveService {
 
     @Inject
+    private EmailService emailService;
+
+    @Inject
     private LeaveRepository leaveRepo;
 
     @Inject
@@ -88,6 +91,8 @@ public class EmployeeLeaveService {
         request.setStatus(LeaveStatus.PENDING);
 
         leaveRepo.save(request);
+
+        emailService.sendLeaveSubmittedEmailToManager(employee, request);
     }
 
     public List<LeaveBalance> getLeaveBalances(Integer employeeId) {
