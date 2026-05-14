@@ -6,7 +6,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @ApplicationScoped
 public class LeaveRepository {
@@ -70,5 +72,52 @@ public class LeaveRepository {
 
     public void update(LeaveRequest request) {
         em.merge(request);
+    }
+
+    public List<LeaveRequest> findApprovedByManagerIdInRange(Integer managerId, LocalDate from, LocalDate to) {
+        return em.createQuery(
+                "SELECT l FROM LeaveRequest l " +
+                        "JOIN FETCH l.employee e " +
+                        "WHERE l.status = :status " +
+                        "AND e.manager.id = :managerId " +
+                        "AND l.startDate <= :to AND l.endDate >= :from " +
+                        "ORDER BY l.startDate ASC",
+                LeaveRequest.class)
+                .setParameter("status", LeaveStatus.APPROVED)
+                .setParameter("managerId", managerId)
+                .setParameter("from", from)
+                .setParameter("to", to)
+                .getResultList();
+    }
+
+    public Optional<LocalDateTime> findOldestPendingCreatedAt(Integer managerId) {
+        List<LocalDateTime> result = em.createQuery(
+                "SELECT l.createdAt FROM LeaveRequest l " +
+                        "WHERE l.status = :status AND l.employee.manager.id = :managerId " +
+                        "ORDER BY l.createdAt ASC",
+                LocalDateTime.class)
+                .setParameter("status", LeaveStatus.PENDING)
+                .setParameter("managerId", managerId)
+                .setMaxResults(1)
+                .getResultList();
+        return result.isEmpty() ? Optional.empty() : Optional.ofNullable(result.get(0));
+    }
+
+    public List<Object[]> monthlyTrendByType(Integer managerId, int year) {
+        LocalDate from = LocalDate.of(year, 1, 1);
+        LocalDate to = from.plusYears(1);
+
+        return em.createQuery(
+                "SELECT FUNCTION('MONTH', l.startDate), l.leaveType, COUNT(l) FROM LeaveRequest l " +
+                        "WHERE l.status = :status AND l.employee.manager.id = :managerId " +
+                        "AND l.startDate >= :from AND l.startDate < :to " +
+                        "GROUP BY FUNCTION('MONTH', l.startDate), l.leaveType " +
+                        "ORDER BY FUNCTION('MONTH', l.startDate)",
+                Object[].class)
+                .setParameter("status", LeaveStatus.APPROVED)
+                .setParameter("managerId", managerId)
+                .setParameter("from", from)
+                .setParameter("to", to)
+                .getResultList();
     }
 }

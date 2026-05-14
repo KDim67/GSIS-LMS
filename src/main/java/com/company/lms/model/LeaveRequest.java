@@ -3,6 +3,7 @@ package com.company.lms.model;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import com.company.lms.util.GreekHolidayUtil;
 
@@ -24,8 +25,18 @@ public class LeaveRequest implements Serializable {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "leave_type", nullable = false, length = 50)
+    @Column(name = "leave_type", nullable = false, length = 30)
     private String leaveType;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    private void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 
     @Column(name = "reason", columnDefinition = "TEXT")
     private String reason;
@@ -63,6 +74,9 @@ public class LeaveRequest implements Serializable {
 
     public String getLeaveType() { return leaveType; }
     public void setLeaveType(String leaveType) { this.leaveType = leaveType; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     public String getReason() { return reason; }
     public void setReason(String reason) { this.reason = reason; }

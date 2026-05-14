@@ -21,10 +21,27 @@
                 </span>
             </div>
 
+            <div class="dialog-actions" style="justify-content:flex-start; margin-bottom:14px;">
+                <p:commandButton icon="pi pi-check"
+                                 value="Μαζική Έγκριση"
+                                 styleClass="btn-approve"
+                                 disabled="#{empty managerController.selectedRequests}"
+                                 action="#{managerController.bulkApprove}"
+                                 update="@form" />
+
+                <p:commandButton icon="pi pi-times"
+                                 value="Μαζική Απόρριψη"
+                                 styleClass="btn-reject"
+                                 disabled="#{empty managerController.selectedRequests}"
+                                 update=":bulkRejectForm:bulkRejectPanel"
+                                 oncomplete="PF('bulkRejectDialog').show()" />
+            </div>
+
             <p:dataTable id="requestsTable"
                          value="#{managerController.pendingRequests}"
                          var="leaveReq"
                          rowKey="#{leaveReq.id}"
+                         selection="#{managerController.selectedRequests}"
                          emptyMessage="Δεν υπάρχουν εκκρεμή αιτήματα αυτή τη στιγμή."
                          paginator="true"
                          rows="10"
@@ -32,6 +49,12 @@
                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          rowsPerPageTemplate="10,20,50"
                          style="margin-top:0;">
+
+                <p:ajax event="rowSelectCheckbox" update="@form" />
+                <p:ajax event="rowUnselectCheckbox" update="@form" />
+                <p:ajax event="toggleSelect" update="@form" />
+
+                <p:column selectionMode="multiple" style="width:34px; text-align:center;" />
 
                 <p:column headerText="ΥΠΑΛΛΗΛΟΣ" sortBy="#{leaveReq.employee.lastName}">
                     <div style="display:flex; align-items:center; gap:8px;">
@@ -165,6 +188,39 @@
                         </div>
 
                     </h:panelGroup>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Μαζική Απόρριψη Αιτημάτων"
+                  widgetVar="bulkRejectDialog"
+                  modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false"
+                  appendTo="@(body)"
+                  style="width:480px;">
+
+            <h:form id="bulkRejectForm">
+                <p:outputPanel id="bulkRejectPanel">
+                    <div class="dialog-comment-wrap">
+                        <label>ΣΧΟΛΙΟ ΔΙΑΧΕΙΡΙΣΤΗ</label>
+                        <p:inputTextarea rows="4" style="width:100%;" placeholder="Προσθέστε σχόλιο..." value="#{managerController.managerComment}" />
+                    </div>
+
+                    <div class="dialog-actions">
+                        <p:commandButton value="Ακύρωση"
+                                         icon="pi pi-ban"
+                                         styleClass="btn-export"
+                                         onclick="PF('bulkRejectDialog').hide(); return false;" />
+
+                        <p:commandButton value="Επιβεβαίωση Απόρριψης"
+                                         action="#{managerController.bulkReject}"
+                                         update=":requestsForm"
+                                         oncomplete="PF('bulkRejectDialog').hide()"
+                                         styleClass="btn-reject"
+                                         icon="pi pi-times" />
+                    </div>
                 </p:outputPanel>
             </h:form>
         </p:dialog>

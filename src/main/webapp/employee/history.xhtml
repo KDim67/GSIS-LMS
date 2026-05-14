@@ -34,7 +34,7 @@
                          style="margin-top:0;">
 
                 <p:column headerText="ΤΥΠΟΣ ΑΔΕΙΑΣ" sortBy="#{leaveReq.leaveType}">
-                    <span class="badge badge-pending" style="text-transform:none;">#{empty leaveReq.leaveType ? '' : leaveReq.leaveType}</span>
+                    <span class="badge badge-pending" style="text-transform:none;">#{leaveReq.leaveType}</span>
                 </p:column>
 
                 <p:column headerText="ΑΠΟ" sortBy="#{leaveReq.startDate}">

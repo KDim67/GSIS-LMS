@@ -1,14 +1,16 @@
 package com.company.lms.util;
 
-import org.mindrot.jbcrypt.BCrypt;
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public class PasswordUtil {
+
+    private static final int COST = 12;
 
     private PasswordUtil() {
     }
 
     public static String hashPassword(String plainPassword) {
-        return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
+        return BCrypt.withDefaults().hashToString(COST, plainPassword.toCharArray());
     }
 
     public static boolean checkPassword(String plainPassword, String hashedPassword) {
@@ -16,6 +18,6 @@ public class PasswordUtil {
             return false;
         }
 
-        return BCrypt.checkpw(plainPassword, hashedPassword);
+        return BCrypt.verifyer().verify(plainPassword.toCharArray(), hashedPassword).verified;
     }
 }

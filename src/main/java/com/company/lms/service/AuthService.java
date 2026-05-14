@@ -1,6 +1,8 @@
 package com.company.lms.service;
 
 import com.company.lms.model.Employee;
+import com.company.lms.model.LeaveBalance;
+import com.company.lms.model.LeaveType;
 import com.company.lms.model.Role;
 import com.company.lms.util.PasswordUtil;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -53,10 +55,13 @@ public class AuthService {
         employee.setLastName(lastName);
         employee.setEmail(email);
         employee.setPassword(PasswordUtil.hashPassword(password));
-        employee.setAnnualLeaveBalance(20);
         employee.setRole(employeeRole);
 
         em.persist(employee);
+
+        for (LeaveType type : LeaveType.values()) {
+            em.persist(new LeaveBalance(employee, type.getDisplayName(), type.getDefaultBalance()));
+        }
     }
 
     public boolean emailExists(String email) {

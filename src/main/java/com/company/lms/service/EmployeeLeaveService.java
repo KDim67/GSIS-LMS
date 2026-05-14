@@ -1,19 +1,18 @@
 package com.company.lms.service;
 
 import com.company.lms.model.Employee;
+import com.company.lms.model.LeaveBalance;
 import com.company.lms.model.LeaveRequest;
 import com.company.lms.model.LeaveStatus;
 import com.company.lms.repository.EmployeeRepository;
+import com.company.lms.repository.LeaveBalanceRepository;
 import com.company.lms.repository.LeaveRepository;
 import com.company.lms.util.GreekHolidayUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import com.company.lms.util.GreekHolidayUtil;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @ApplicationScoped
 public class EmployeeLeaveService {
@@ -23,6 +22,9 @@ public class EmployeeLeaveService {
 
     @Inject
     private EmployeeRepository employeeRepo;
+
+    @Inject
+    private LeaveBalanceRepository leaveBalanceRepo;
 
     public Employee getEmployee(Integer employeeId) {
         return employeeRepo.findById(employeeId);
@@ -58,7 +60,7 @@ public class EmployeeLeaveService {
             throw new IllegalArgumentException("Η ημερομηνία λήξης δεν μπορεί να προηγείται της ημερομηνίας έναρξης.");
         }
 
-        if (leaveType == null || leaveType.trim().isEmpty()) {
+        if (leaveType == null || leaveType.isBlank()) {
             throw new IllegalArgumentException("Παρακαλώ επιλέξτε τύπο άδειας.");
         }
 
@@ -68,7 +70,8 @@ public class EmployeeLeaveService {
             throw new IllegalArgumentException("Το διάστημα άδειας πρέπει να περιλαμβάνει τουλάχιστον μία εργάσιμη ημέρα.");
         }
 
-        if (employee.getAnnualLeaveBalance() < workingDays) {
+        int balance = leaveBalanceRepo.getBalance(employeeId, leaveType);
+        if (balance < workingDays) {
             throw new IllegalStateException("Οι εργάσιμες ημέρες υπερβαίνουν το διαθέσιμο υπόλοιπο άδειας.");
         }
 
@@ -80,11 +83,23 @@ public class EmployeeLeaveService {
         request.setEmployee(employee);
         request.setStartDate(startDate);
         request.setEndDate(endDate);
-        request.setLeaveType(leaveType.trim());
+        request.setLeaveType(leaveType);
         request.setReason(reason);
         request.setStatus(LeaveStatus.PENDING);
 
         leaveRepo.save(request);
+    }
+
+    public List<LeaveBalance> getLeaveBalances(Integer employeeId) {
+        return leaveBalanceRepo.findByEmployeeId(employeeId);
+    }
+
+    public int getTotalLeaveBalance(Integer employeeId) {
+        return leaveBalanceRepo.sumTotalForEmployee(employeeId);
+    }
+
+    public int getBalanceForType(Integer employeeId, String leaveType) {
+        return leaveBalanceRepo.getBalance(employeeId, leaveType);
     }
 
     public int calculateWorkingDays(LocalDate startDate, LocalDate endDate) {

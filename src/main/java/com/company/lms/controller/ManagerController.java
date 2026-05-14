@@ -10,7 +10,9 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Named
 @ViewScoped
@@ -23,6 +25,7 @@ public class ManagerController implements Serializable {
     private LoginController loginController;
 
     private List<LeaveRequest> pendingRequests;
+    private List<LeaveRequest> selectedRequests;
     private LeaveRequest selectedRequest;
     private String managerComment;
     private String pendingAction;
@@ -37,10 +40,12 @@ public class ManagerController implements Serializable {
 
         if (currentManager == null) {
             pendingRequests = List.of();
+            selectedRequests = List.of();
             return;
         }
 
         pendingRequests = managerService.getPendingRequests(currentManager);
+        selectedRequests = new ArrayList<>();
     }
 
     public void approveLeave() {
@@ -90,8 +95,57 @@ public class ManagerController implements Serializable {
         }
     }
 
+    public void bulkApprove() {
+        try {
+            Employee currentManager = loginController.getLoggedInUser();
+            int count = managerService.approveLeaves(getSelectedRequestIds(), currentManager, managerComment);
+
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Επιτυχία", "Εγκρίθηκαν " + count + " αιτήματα"));
+
+            managerComment = null;
+            selectedRequests = new ArrayList<>();
+            pendingAction = null;
+            loadRequests();
+
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Σφάλμα", e.getMessage()));
+        }
+    }
+
+    public void bulkReject() {
+        try {
+            Employee currentManager = loginController.getLoggedInUser();
+            int count = managerService.rejectLeaves(getSelectedRequestIds(), currentManager, managerComment);
+
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Επιτυχία", "Απορρίφθηκαν " + count + " αιτήματα"));
+
+            managerComment = null;
+            selectedRequests = new ArrayList<>();
+            pendingAction = null;
+            loadRequests();
+
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Σφάλμα", e.getMessage()));
+        }
+    }
+
+    private List<Integer> getSelectedRequestIds() {
+        if (selectedRequests == null) {
+            return List.of();
+        }
+        return selectedRequests.stream()
+                .map(LeaveRequest::getId)
+                .collect(Collectors.toList());
+    }
+
     // Getters and Setters
     public List<LeaveRequest> getPendingRequests() { return pendingRequests; }
+    public List<LeaveRequest> getSelectedRequests() { return selectedRequests; }
+    public void setSelectedRequests(List<LeaveRequest> selectedRequests) { this.selectedRequests = selectedRequests; }
     public LeaveRequest getSelectedRequest() { return selectedRequest; }
     public void setSelectedRequest(LeaveRequest selectedRequest) { this.selectedRequest = selectedRequest; }
     public String getManagerComment() { return managerComment; }

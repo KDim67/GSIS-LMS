@@ -23,9 +23,6 @@ public class Employee implements Serializable {
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
-    @Column(name = "annual_leave_balance", nullable = false)
-    private Integer annualLeaveBalance = 0;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
@@ -55,9 +52,6 @@ public class Employee implements Serializable {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
-
-    public Integer getAnnualLeaveBalance() { return annualLeaveBalance; }
-    public void setAnnualLeaveBalance(Integer annualLeaveBalance) { this.annualLeaveBalance = annualLeaveBalance; }
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }

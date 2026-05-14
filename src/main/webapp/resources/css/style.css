@@ -322,6 +322,36 @@ h1, h2, h3, h4 {
 
 .chart-box-body { padding: 20px; }
 
+.manager-week-overview {
+    grid-template-columns: minmax(0, 0.85fr) minmax(640px, 1.15fr);
+}
+
+.team-schedule-body {
+    overflow: visible;
+}
+
+.team-schedule {
+    min-width: 640px;
+    height: 480px !important;
+}
+
+.team-schedule .fc {
+    height: 480px !important;
+}
+
+.team-schedule .fc-view-harness {
+    min-height: 350px !important;
+}
+
+.team-schedule .fc-scroller {
+    overflow: visible !important;
+}
+
+.team-schedule .fc-daygrid-body,
+.team-schedule .fc-scrollgrid-sync-table {
+    width: 100% !important;
+}
+
 /* PrimeFaces DataTable Overrides */
 body .ui-datatable {
     border-radius: var(--radius-lg);
@@ -370,6 +400,27 @@ body .ui-datatable tbody td {
     vertical-align: middle;
     font-size: 0.9rem;
     color: var(--text-main);
+}
+
+body .ui-datatable .ui-selection-column {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+body .ui-datatable .ui-selection-column .ui-chkbox {
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+body .ui-datatable .ui-selection-column .ui-chkbox .ui-chkbox-box {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+body .ui-datatable .ui-selection-column .ui-chkbox-icon {
+    display: block !important;
+    line-height: 1 !important;
 }
 
 body .ui-datatable tbody tr {
@@ -685,6 +736,7 @@ body .ui-growl-item-container {
 @media (max-width: 1024px) {
     .stats-summary { grid-template-columns: repeat(2, 1fr); }
     .chart-container { grid-template-columns: 1fr; }
+    .manager-week-overview { grid-template-columns: 1fr; }
     .container { padding: 20px; }
     .layout-navbar { padding: 0 16px; }
     .header-top { padding: 12px 20px; }
@@ -732,4 +784,29 @@ body .ui-growl-item-container {
     color: var(--text-sub);
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+.leave-type-annual {
+    background-color: #0188ca !important;
+    border-color: #0188ca !important;
+}
+
+.leave-type-sick {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.leave-type-unpaid {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+}
+
+.leave-type-parental {
+    background-color: #9b59b6 !important;
+    border-color: #9b59b6 !important;
+}
+
+.leave-type-study {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
 }

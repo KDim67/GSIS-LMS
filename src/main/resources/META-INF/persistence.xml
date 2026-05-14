@@ -13,6 +13,7 @@
         <class>com.company.lms.model.Employee</class>
         <class>com.company.lms.model.LeaveRequest</class>
         <class>com.company.lms.model.AuditLog</class>
+        <class>com.company.lms.model.LeaveBalance</class>
 
         <properties>
             <property name="jakarta.persistence.schema-generation.database.action" value="create"/>

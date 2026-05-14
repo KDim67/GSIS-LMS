@@ -17,13 +17,29 @@
                 </h2>
             </div>
 
+            <p:dialog header="Υπόλοιπα Αδειών ανά Τύπο"
+                      widgetVar="balanceDialog"
+                      modal="true"
+                      resizable="false"
+                      style="width:420px;">
+                <p:dataTable value="#{employeeController.leaveBalances}" var="lb"
+                             emptyMessage="Δεν βρέθηκαν υπόλοιπα.">
+                    <p:column headerText="Τύπος Άδειας">
+                        #{lb.leaveType}
+                    </p:column>
+                    <p:column headerText="Υπόλοιπο" style="text-align:center; width:100px;">
+                        <span class="fw-bold text-blue">#{lb.balance}</span>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+
             <div class="stats-summary">
-                <div class="stat-card">
+                <div class="stat-card" style="cursor:pointer;" onclick="PF('balanceDialog').show()">
                     <div class="stat-icon blue">
                         <i class="pi pi-calendar-plus"></i>
                     </div>
                     <div class="stat-info">
-                        <div class="stat-value">#{employeeController.employee.annualLeaveBalance}</div>
+                        <div class="stat-value">#{employeeController.totalLeaveBalance}</div>
                         <div class="stat-label">ΥΠΟΛΟΙΠΟ ΑΔΕΙΑΣ</div>
                     </div>
                 </div>
@@ -98,11 +114,19 @@
                                                  value="#{employeeController.leaveType}"
                                                  required="true"
                                                  requiredMessage="Ο τύπος άδειας είναι υποχρεωτικός.">
-                                    <f:selectItem itemLabel="Επιλέξτε τύπο" itemValue="" noSelectionOption="true" />
-                                    <f:selectItem itemLabel="Κανονική Άδεια" itemValue="Κανονική Άδεια" />
-                                    <f:selectItem itemLabel="Αναρρωτική Άδεια" itemValue="Αναρρωτική Άδεια" />
-                                    <f:selectItem itemLabel="Ειδική Άδεια" itemValue="Ειδική Άδεια" />
+                                    <f:selectItem itemLabel="Επιλέξτε τύπο" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{employeeController.leaveTypes}"
+                                                   var="type"
+                                                   itemLabel="#{type.displayName}"
+                                                   itemValue="#{type.displayName}" />
+                                    <p:ajax update="typeBalance workingDays" />
                                 </p:selectOneMenu>
+                                <h:panelGroup id="typeBalance" layout="block"
+                                              rendered="#{not empty employeeController.leaveType}"
+                                              style="margin-top:6px; font-size:0.82rem; color:var(--text-sub);">
+                                    <i class="pi pi-info-circle" style="margin-right:4px;"></i>
+                                    Υπόλοιπο: <span class="fw-bold" style="color:var(--blue);">#{employeeController.selectedTypeBalance}</span> ημέρες
+                                </h:panelGroup>
                             </div>
 
                             <div>

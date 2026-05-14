@@ -1,8 +1,10 @@
 package com.company.lms.controller;
 
 import com.company.lms.model.Employee;
+import com.company.lms.model.LeaveBalance;
 import com.company.lms.model.LeaveRequest;
 import com.company.lms.model.LeaveStatus;
+import com.company.lms.model.LeaveType;
 import com.company.lms.service.EmployeeLeaveService;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -27,6 +29,7 @@ public class EmployeeController implements Serializable {
 
     private Employee employee;
     private List<LeaveRequest> leaveHistory;
+    private List<LeaveBalance> leaveBalances;
     private LocalDate startDate;
     private LocalDate endDate;
     private String leaveType;
@@ -47,6 +50,7 @@ public class EmployeeController implements Serializable {
 
         employee = employeeService.getEmployee(loggedInUser.getId());
         leaveHistory = employeeService.getLeaveHistory(loggedInUser.getId());
+        leaveBalances = employeeService.getLeaveBalances(loggedInUser.getId());
     }
 
     public void submitLeaveRequest() {
@@ -72,6 +76,20 @@ public class EmployeeController implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Σφάλμα", e.getMessage()));
         }
+    }
+
+    public int getTotalLeaveBalance() {
+        if (leaveBalances == null) return 0;
+        return leaveBalances.stream().mapToInt(LeaveBalance::getBalance).sum();
+    }
+
+    public int getSelectedTypeBalance() {
+        if (leaveType == null || leaveBalances == null) return 0;
+        return leaveBalances.stream()
+                .filter(lb -> leaveType.equals(lb.getLeaveType()))
+                .mapToInt(LeaveBalance::getBalance)
+                .findFirst()
+                .orElse(0);
     }
 
     public int getRequestedWorkingDays() {
@@ -104,12 +122,14 @@ public class EmployeeController implements Serializable {
 
     public Employee getEmployee() { return employee; }
     public List<LeaveRequest> getLeaveHistory() { return leaveHistory; }
+    public List<LeaveBalance> getLeaveBalances() { return leaveBalances; }
     public LocalDate getStartDate() { return startDate; }
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
     public LocalDate getEndDate() { return endDate; }
     public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
     public String getLeaveType() { return leaveType; }
     public void setLeaveType(String leaveType) { this.leaveType = leaveType; }
+    public LeaveType[] getLeaveTypes() { return LeaveType.values(); }
     public String getReason() { return reason; }
     public void setReason(String reason) { this.reason = reason; }
     public LeaveRequest getSelectedRequest() { return selectedRequest; }

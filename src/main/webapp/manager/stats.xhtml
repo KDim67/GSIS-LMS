@@ -10,7 +10,7 @@
         <div class="page-header">
             <h2>
                 <i class="pi pi-chart-bar"></i>
-                Στατιστικά Τμήματος
+                Στατιστικά
             </h2>
             <span class="text-muted" style="font-size:0.85rem;">
                 <i class="pi pi-calendar" style="margin-right:5px;"></i>
@@ -61,9 +61,35 @@
                     <div class="stat-label">ΑΠΟΡΡΙΦΘΕΝΤΑ</div>
                 </div>
             </div>
+
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="pi pi-percentage"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">#{dashboardController.leaveUtilizationPercent}%</div>
+                    <div class="stat-label">ΧΡΗΣΗ ΑΔΕΙΑΣ</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="pi pi-hourglass"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">#{dashboardController.longestPendingRequestAge}</div>
+                    <div class="stat-label">ΗΜΕΡΕΣ ΠΑΛΑΙΟΤΕΡΟΥ ΕΚΚΡΕΜΟΥΣ</div>
+                </div>
+            </div>
         </div>
 
         <h:form id="dashboardChartsForm">
+            <h:outputScript>
+                function teamScheduleExtender() {
+                    this.cfg.options.fixedWeekCount = false;
+                }
+            </h:outputScript>
+
             <div class="chart-container">
 
                 <div class="chart-box">
@@ -86,6 +112,65 @@
                     </div>
                 </div>
 
+            </div>
+
+            <div class="chart-container" style="grid-template-columns:1fr; margin-top:18px;">
+                <div class="chart-box">
+                    <div class="chart-box-header">
+                        <h3><i class="pi pi-chart-line" style="margin-right:6px;"></i>Τάσεις Αδειών ανά Μήνα και Τύπο</h3>
+                    </div>
+                    <div class="chart-box-body">
+                        <p:lineChart model="#{dashboardController.trendModel}"
+                                     style="width:100%; height:360px;" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container manager-week-overview" style="margin-top:18px;">
+                <div class="chart-box">
+                    <div class="chart-box-header">
+                        <h3><i class="pi pi-users" style="margin-right:6px;"></i>Ποιοι Λείπουν Αυτή την Εβδομάδα</h3>
+                    </div>
+                    <div class="chart-box-body">
+                        <p:dataTable value="#{dashboardController.onLeaveThisWeek}"
+                                     var="leaveReq"
+                                     emptyMessage="Δεν υπάρχουν εγκεκριμένες άδειες αυτή την εβδομάδα.">
+                            <p:column headerText="Υπάλληλος">
+                                #{leaveReq.employee.fullName}
+                            </p:column>
+                            <p:column headerText="Τύπος">
+                                #{leaveReq.leaveType}
+                            </p:column>
+                            <p:column headerText="Από">
+                                <h:outputText value="#{leaveReq.startDate}">
+                                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Έως">
+                                <h:outputText value="#{leaveReq.endDate}">
+                                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+
+                <div class="chart-box">
+                    <div class="chart-box-header">
+                        <h3><i class="pi pi-calendar" style="margin-right:6px;"></i>Ημερολόγιο Ομάδας</h3>
+                    </div>
+                    <div class="chart-box-body team-schedule-body">
+                        <p:schedule value="#{dashboardController.teamScheduleModel}"
+                                    styleClass="team-schedule"
+                                    height="480"
+                                    initialView="timeGridWeek"
+                                    extender="teamScheduleExtender"
+                                    showWeekends="false"
+                                    draggable="false"
+                                    resizable="false"
+                                    locale="el" />
+                    </div>
+                </div>
             </div>
         </h:form>
 
