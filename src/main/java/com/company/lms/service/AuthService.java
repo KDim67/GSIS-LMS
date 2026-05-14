@@ -59,7 +59,6 @@ public class AuthService {
         employee.setLastName(lastName);
         employee.setEmail(email);
         employee.setPassword(PasswordUtil.hashPassword(password));
-        employee.setAnnualLeaveBalance(20);
         employee.setRole(employeeRole);
 
         em.persist(employee);

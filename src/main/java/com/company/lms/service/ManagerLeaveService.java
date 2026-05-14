@@ -66,16 +66,18 @@ public class ManagerLeaveService {
 
         int updatedRows = leaveBalanceRepo.deductBalance(employee.getId(), request.getLeaveType(), workingDays);
         if (updatedRows != 1) {
-            throw new IllegalStateException("Ο υπάλληλος δεν έχει επαρκή υπολειπόμενη άδεια (τύπος: #{request.getLeaveType()}).");
+            throw new IllegalStateException("Ο υπάλληλος δεν έχει επαρκή υπολειπόμενη άδεια (τύπος: " + request.getLeaveType() + ").");
         }
         
-        employee.setAnnualLeaveBalance(employee.getAnnualLeaveBalance() - workingDays);
-
         // 3. Log to Audit (Updated action string and passed comment)
         auditService.logAction(manager, "APPROVE", request.getId(), comment);
         
         // 4. Save changes via Repositories
         leaveRepo.update(request);
+        
+        // 5. Update employee and send notification
+        employeeRepo.update(employee);
+        emailService.sendLeaveApprovedEmailToEmployee(employee, request);
     }
 
     @Transactional
@@ -137,11 +139,9 @@ public class ManagerLeaveService {
         return total;
     }
 
+    // FIXED: Removed the out-of-scope and unreachable code
     public int getTeamRemainingBalance(Employee manager) {
         return leaveBalanceRepo.sumTotalForManager(manager.getId());
-        employeeRepo.update(employee);
-
-        emailService.sendLeaveApprovedEmailToEmployee(employee, request);
     }
 
     @Transactional
