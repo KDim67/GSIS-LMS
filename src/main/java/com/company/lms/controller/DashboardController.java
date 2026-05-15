@@ -270,6 +270,7 @@ public class DashboardController implements Serializable {
                     .title(title)
                     .startDate(request.getStartDate().atStartOfDay())
                     .endDate(request.getEndDate().plusDays(1).atStartOfDay())
+                    .allDay(true)
                     .styleClass(getLeaveTypeStyleClass(request.getLeaveType()))
                     .build());
         }
