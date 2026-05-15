@@ -2,6 +2,9 @@ package com.company.lms.controller;
 
 import com.company.lms.model.AuditLog;
 import com.company.lms.service.AuditService;
+import com.company.lms.repository.LeaveRepository;
+import com.company.lms.model.LeaveRequest;
+import com.company.lms.model.Employee;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
@@ -19,6 +22,9 @@ import java.time.LocalDateTime;
 @Named
 @ViewScoped
 public class AuditController implements Serializable {
+
+    @Inject
+    private LeaveRepository leaveRepo;
 
     @Inject
     private AuditService auditService;
@@ -132,7 +138,8 @@ public class AuditController implements Serializable {
             html.append("<thead>");
             html.append("<tr>");
             html.append("<th>ΗΜΕΡΟΜΗΝΙΑ &amp; ΩΡΑ</th>");
-            html.append("<th>ΧΡΗΣΤΗΣ</th>");
+            html.append("<th>ΠΡΟΪΣΤΑΜΕΝΟΣ</th>");
+            html.append("<th>ΥΠΑΛΛΗΛΟΣ</th>");
             html.append("<th>ΕΝΕΡΓΕΙΑ</th>");
             html.append("<th>ΑΝΑΓΝΩΡΙΣΤΙΚΟ</th>");
             html.append("<th>ΣΧΟΛΙΟ</th>");
@@ -146,6 +153,7 @@ public class AuditController implements Serializable {
                     html.append("<tr>");
                     html.append("<td>").append(escapeHtml(exportTimestamp(log))).append("</td>");
                     html.append("<td>").append(escapeHtml(exportUser(log))).append("</td>");
+                    html.append("<td>").append(escapeHtml(exportTargetEmployee(log))).append("</td>");
                     html.append("<td>").append(escapeHtml(exportAction(log))).append("</td>");
                     html.append("<td>").append(escapeHtml(exportTargetId(log))).append("</td>");
                     html.append("<td>").append(escapeHtml(exportComment(log))).append("</td>");
@@ -180,5 +188,45 @@ public class AuditController implements Serializable {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+    public Employee getTargetEmployee(AuditLog log) {
+        if (log == null || log.getTargetId() == null) {
+            return null;
+        }
+
+        LeaveRequest request = leaveRepo.findByIdWithEmployee(log.getTargetId());
+
+        if (request == null) {
+            return null;
+        }
+
+        return request.getEmployee();
+    }
+
+    public String exportTargetEmployee(AuditLog log) {
+        Employee employee = getTargetEmployee(log);
+
+        if (employee == null) {
+            return "-";
+        }
+
+        String fullName = employee.getFullName() != null
+                ? employee.getFullName()
+                : "";
+
+        String email = employee.getEmail() != null
+                ? employee.getEmail()
+                : "";
+
+        if (email.isBlank()) {
+            return fullName;
+        }
+
+        if (fullName.isBlank()) {
+            return email;
+        }
+
+        return fullName + " - " + email;
     }
 }

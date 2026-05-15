@@ -48,7 +48,7 @@
                     </span>
                 </p:column>
 
-                <p:column headerText="ΧΡΗΣΤΗΣ"
+                <p:column headerText="ΠΡΟΪΣΤΑΜΕΝΟΣ"
                           filterBy="#{log.user.fullName}"
                           filterMatchMode="contains"
                           filterPlaceholder="Αναζήτηση..."
@@ -71,6 +71,35 @@
                     </div>
                 </p:column>
 
+                <p:column headerText="ΥΠΑΛΛΗΛΟΣ"
+                          filterBy="#{auditController.getTargetEmployee(log).fullName}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Αναζήτηση..."
+                          exportValue="#{auditController.exportTargetEmployee(log)}">
+                    <ui:param name="employee" value="#{auditController.getTargetEmployee(log)}" />
+                    <h:panelGroup rendered="#{not empty employee}">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="width:30px; height:30px; border-radius:50%;
+                                         background:var(--blue-light); color:var(--blue);
+                                         display:inline-flex; align-items:center; justify-content:center;
+                                         font-weight:700; font-size:0.8rem; flex-shrink:0;">
+                                #{employee.firstName.substring(0,1)}#{employee.lastName.substring(0,1)}
+                            </span>
+                            <div>
+                                <div class="fw-bold" style="font-size:0.875rem;">
+                                    #{employee.firstName} #{employee.lastName}
+                                </div>
+                                <div class="text-muted" style="font-size:0.78rem;">
+                                    #{employee.email}
+                                </div>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{empty employee}">
+                        <span class="text-muted">-</span>
+                    </h:panelGroup>
+                </p:column>
+
                 <p:column headerText="ΕΝΕΡΓΕΙΑ"
                           filterBy="#{log.action}"
                           filterMatchMode="contains"
@@ -87,6 +116,7 @@
                 </p:column>
 
                 <p:column headerText="ΑΝΑΓΝΩΡΙΣΤΙΚΟ"
+                          sortBy="#{log.targetId}"
                           exportValue="#{auditController.exportTargetId(log)}"
                           style="width:150px;">
                     <span style="font-family: monospace; color:var(--blue); font-weight:600;

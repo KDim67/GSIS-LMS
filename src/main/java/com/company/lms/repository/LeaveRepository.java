@@ -120,4 +120,20 @@ public class LeaveRepository {
                 .setParameter("to", to)
                 .getResultList();
     }
+
+    public LeaveRequest findByIdWithEmployee(Integer id) {
+        if (id == null) {
+            return null;
+        }
+
+        List<LeaveRequest> results = em.createQuery(
+                        "SELECT l FROM LeaveRequest l " +
+                                "JOIN FETCH l.employee " +
+                                "WHERE l.id = :id",
+                        LeaveRequest.class)
+                .setParameter("id", id)
+                .getResultList();
+
+        return results.isEmpty() ? null : results.get(0);
+    }
 }
