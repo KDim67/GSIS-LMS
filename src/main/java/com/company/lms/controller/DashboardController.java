@@ -22,6 +22,7 @@ import org.primefaces.model.charts.line.LineChartOptions;
 import org.primefaces.model.charts.pie.PieChartDataSet;
 import org.primefaces.model.charts.pie.PieChartModel;
 import org.primefaces.model.charts.pie.PieChartOptions;
+import org.primefaces.model.charts.optionconfig.legend.Legend;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -57,6 +58,9 @@ public class DashboardController implements Serializable {
     private int leaveUtilizationPercent;
     private long longestPendingRequestAge;
     private List<LeaveRequest> onLeaveThisWeek;
+    private List<LeaveType> activeBarLeaveTypes = new ArrayList<>();
+    private List<ChartLegendItem> statusLegendItems = new ArrayList<>();
+    private List<LeaveType> trendLeaveTypes = new ArrayList<>();
 
     @PostConstruct
     public void init() {
@@ -70,6 +74,7 @@ public class DashboardController implements Serializable {
 
     private void createPieModelAndKPIs() {
         pieModel = new PieChartModel();
+        statusLegendItems = new ArrayList<>();
         Employee manager = loginController.getLoggedInUser();
         if (manager == null) {
             return;
@@ -94,17 +99,22 @@ public class DashboardController implements Serializable {
             labels.add(status);
             values.add(count);
             total += count;
-            
+
+            String color;
+
             if ("Εγκρίθηκε".equals(status)) {
-                bgColors.add("#28a745");
+                color = "#28a745";
                 approved = count;
             } else if ("Εκκρεμεί".equals(status)) {
-                bgColors.add("#ed5929");
+                color = "#ed5929";
                 pending = count;
             } else {
-                bgColors.add("#dc3545");
+                color = "#dc3545";
                 rejected += count;
             }
+
+            bgColors.add(color);
+            statusLegendItems.add(new ChartLegendItem(status, color));
         }
 
         this.totalRequests = total;
@@ -117,39 +127,70 @@ public class DashboardController implements Serializable {
         data.addChartDataSet(dataSet);
         data.setLabels(labels);
         pieModel.setData(data);
-        
+
         PieChartOptions options = new PieChartOptions();
         options.setMaintainAspectRatio(false);
+
+        Legend legend = new Legend();
+        legend.setDisplay(false);
+        options.setLegend(legend);
+
         pieModel.setOptions(options);
     }
 
     private void createBarModel() {
         barModel = new BarChartModel();
+
         Employee manager = loginController.getLoggedInUser();
+
         if (manager == null) {
             return;
         }
+
         ChartData data = new ChartData();
+
         BarChartDataSet barDataSet = new BarChartDataSet();
-        barDataSet.setLabel("Άδειες ανά Τύπο");
 
         Map<String, Long> stats = statsService.getLeavesByType(manager.getId());
-        List<Number> values = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
 
-        for (Map.Entry<String, Long> entry : stats.entrySet()) {
-            labels.add(entry.getKey());
-            values.add(entry.getValue());
+        List<String> labels = new ArrayList<>();
+        List<Number> values = new ArrayList<>();
+        List<String> backgroundColors = new ArrayList<>();
+        List<String> borderColors = new ArrayList<>();
+
+        activeBarLeaveTypes = new ArrayList<>();
+
+        for (LeaveType type : LeaveType.values()) {
+            long count = stats.getOrDefault(type.getDisplayName(), 0L);
+
+            if (count > 0) {
+                labels.add(type.getDisplayName());
+                values.add(count);
+
+                backgroundColors.add(type.getColor());
+                borderColors.add(type.getColor());
+
+                activeBarLeaveTypes.add(type);
+            }
         }
 
         barDataSet.setData(values);
-        barDataSet.setBackgroundColor("#0188ca"); 
+        barDataSet.setBackgroundColor(backgroundColors);
+        barDataSet.setBorderColor(borderColors);
+        barDataSet.setBorderWidth(1);
+
         data.addChartDataSet(barDataSet);
         data.setLabels(labels);
+
         barModel.setData(data);
-        
+
         BarChartOptions options = new BarChartOptions();
         options.setMaintainAspectRatio(false);
+
+        Legend legend = new Legend();
+        legend.setDisplay(false);
+        options.setLegend(legend);
+
         barModel.setOptions(options);
     }
 
@@ -172,6 +213,7 @@ public class DashboardController implements Serializable {
     }
 
     private void createTrendModel() {
+        trendLeaveTypes = new ArrayList<>();
         trendModel = new LineChartModel();
         ChartData data = new ChartData();
         Employee manager = loginController.getLoggedInUser();
@@ -194,12 +236,18 @@ public class DashboardController implements Serializable {
                 }
                 dataSet.setData(values);
                 data.addChartDataSet(dataSet);
+                trendLeaveTypes.add(type);
             }
         }
 
         trendModel.setData(data);
         LineChartOptions options = new LineChartOptions();
         options.setMaintainAspectRatio(false);
+
+        Legend legend = new Legend();
+        legend.setDisplay(false);
+        options.setLegend(legend);
+
         trendModel.setOptions(options);
     }
 
@@ -246,6 +294,16 @@ public class DashboardController implements Serializable {
         return "leave-type-annual";
     }
 
+    private String getLeaveTypeColor(String leaveType) {
+        for (LeaveType type : LeaveType.values()) {
+            if (type.getDisplayName().equals(leaveType)) {
+                return type.getColor();
+            }
+        }
+
+        return "#0188ca";
+    }
+
     public PieChartModel getPieModel() { return pieModel; }
     public BarChartModel getBarModel() { return barModel; }
     public LineChartModel getTrendModel() { return trendModel; }
@@ -258,4 +316,26 @@ public class DashboardController implements Serializable {
     public int getLeaveUtilizationPercent() { return leaveUtilizationPercent; }
     public long getLongestPendingRequestAge() { return longestPendingRequestAge; }
     public List<LeaveRequest> getOnLeaveThisWeek() { return onLeaveThisWeek; }
+    public List<LeaveType> getActiveBarLeaveTypes() { return activeBarLeaveTypes; }
+    public List<ChartLegendItem> getStatusLegendItems() { return statusLegendItems; }
+
+    public List<LeaveType> getTrendLeaveTypes() { return trendLeaveTypes; }
+
+    public static class ChartLegendItem implements Serializable {
+        private String label;
+        private String color;
+
+        public ChartLegendItem(String label, String color) {
+            this.label = label;
+            this.color = color;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getColor() {
+            return color;
+        }
+    }
 }

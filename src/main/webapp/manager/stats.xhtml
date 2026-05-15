@@ -14,7 +14,7 @@
             </h2>
             <span class="text-muted" style="font-size:0.85rem;">
                 <i class="pi pi-calendar" style="margin-right:5px;"></i>
-                Τελευταία ενημέρωση: 
+                Τελευταία ενημέρωση:
                 <h:outputText value="#{dashboardController.lastUpdated}">
                     <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
                 </h:outputText>
@@ -87,6 +87,219 @@
             <h:outputScript>
                 function teamScheduleExtender() {
                     this.cfg.options.fixedWeekCount = false;
+                    this.cfg.options.displayEventTime = false;
+                }
+
+                var leaveTypeBarOriginalData = null;
+                var leaveTypeBarHiddenIndexes = {};
+
+                function barChartExtender() {
+                    var options = this.cfg.config.options;
+
+                    options.legend = options.legend || {};
+                    options.legend.display = false;
+
+                    options.plugins = options.plugins || {};
+                    options.plugins.legend = options.plugins.legend || {};
+                    options.plugins.legend.display = false;
+
+                    options.scales = options.scales || {};
+
+                    if (options.scales.y) {
+                        options.scales.y.beginAtZero = true;
+                        options.scales.y.ticks = options.scales.y.ticks || {};
+                        options.scales.y.ticks.stepSize = 1;
+                        options.scales.y.ticks.precision = 0;
+                    }
+
+                    if (options.scales.yAxes &amp;&amp; options.scales.yAxes.length > 0) {
+                        options.scales.yAxes[0].ticks = options.scales.yAxes[0].ticks || {};
+                        options.scales.yAxes[0].ticks.beginAtZero = true;
+                        options.scales.yAxes[0].ticks.stepSize = 1;
+                        options.scales.yAxes[0].ticks.precision = 0;
+                    }
+                }
+
+                function getLeaveTypeBarChart() {
+                    var widget = PF('leaveTypeBarChart');
+
+                    if (!widget) {
+                        return null;
+                    }
+
+                    return widget.chart || widget.cfg.chart;
+                }
+
+                function initializeLeaveTypeBarOriginalData(chart) {
+                    if (leaveTypeBarOriginalData !== null) {
+                        return;
+                    }
+
+                    var dataset = chart.data.datasets[0];
+
+                    leaveTypeBarOriginalData = {
+                        labels: chart.data.labels.slice(),
+                        data: dataset.data.slice(),
+                        backgroundColor: Array.isArray(dataset.backgroundColor)
+                        ? dataset.backgroundColor.slice()
+                        : chart.data.labels.map(function () { return dataset.backgroundColor; }),
+                        borderColor: Array.isArray(dataset.borderColor)
+                        ? dataset.borderColor.slice()
+                        : chart.data.labels.map(function () { return dataset.borderColor; })
+                    };
+                }
+
+                function toggleLeaveTypeBar(index) {
+                    var chart = getLeaveTypeBarChart();
+
+                    if (!chart) {
+                        return;
+                    }
+
+                    initializeLeaveTypeBarOriginalData(chart);
+
+                    leaveTypeBarHiddenIndexes[index] = !leaveTypeBarHiddenIndexes[index];
+
+                    var newLabels = [];
+                    var newData = [];
+                    var newBackgroundColors = [];
+                    var newBorderColors = [];
+
+                    for (var i = 0; i &lt; leaveTypeBarOriginalData.labels.length; i++) {
+                        if (!leaveTypeBarHiddenIndexes[i]) {
+                            newLabels.push(leaveTypeBarOriginalData.labels[i]);
+                            newData.push(leaveTypeBarOriginalData.data[i]);
+                            newBackgroundColors.push(leaveTypeBarOriginalData.backgroundColor[i]);
+                            newBorderColors.push(leaveTypeBarOriginalData.borderColor[i]);
+                        }
+                    }
+
+                    chart.data.labels = newLabels;
+                    chart.data.datasets[0].data = newData;
+                    chart.data.datasets[0].backgroundColor = newBackgroundColors;
+                    chart.data.datasets[0].borderColor = newBorderColors;
+
+                    chart.update();
+
+                    updateLeaveTypeLegendStyle(index);
+                }
+
+                function updateLeaveTypeLegendStyle(index) {
+                    var item = document.querySelector('.leave-type-legend-item[data-index="' + index + '"]');
+
+                    if (!item) {
+                        return;
+                    }
+
+                    if (leaveTypeBarHiddenIndexes[index]) {
+                        item.style.opacity = '0.35';
+                    } else {
+                        item.style.opacity = '1';
+                    }
+                }
+
+                function pieChartExtender() {
+                    var options = this.cfg.config.options || {};
+                    this.cfg.config.options = options;
+
+                    options.legend = options.legend || {};
+                    options.legend.display = false;
+
+                    options.plugins = options.plugins || {};
+                    options.plugins.legend = options.plugins.legend || {};
+                    options.plugins.legend.display = false;
+                }
+
+                function lineChartExtender() {
+                    var options = this.cfg.config.options || {};
+                    this.cfg.config.options = options;
+
+                    options.legend = options.legend || {};
+                    options.legend.display = false;
+
+                    options.plugins = options.plugins || {};
+                    options.plugins.legend = options.plugins.legend || {};
+                    options.plugins.legend.display = false;
+
+                    options.scales = options.scales || {};
+
+                    if (options.scales.y) {
+                        options.scales.y.beginAtZero = true;
+                        options.scales.y.ticks = options.scales.y.ticks || {};
+                        options.scales.y.ticks.stepSize = 1;
+                        options.scales.y.ticks.precision = 0;
+                    }
+
+                    if (options.scales.yAxes &amp;&amp; options.scales.yAxes.length > 0) {
+                        options.scales.yAxes[0].ticks = options.scales.yAxes[0].ticks || {};
+                        options.scales.yAxes[0].ticks.beginAtZero = true;
+                        options.scales.yAxes[0].ticks.stepSize = 1;
+                        options.scales.yAxes[0].ticks.precision = 0;
+                    }
+                }
+
+                function getPrimeFacesChart(widgetVar) {
+                    var widget = PF(widgetVar);
+
+                    if (!widget) {
+                        return null;
+                    }
+
+                    return widget.chart || widget.cfg.chart;
+                }
+
+                function togglePieSlice(index) {
+                    var chart = getPrimeFacesChart('statusPieChart');
+
+                    if (!chart) {
+                        return;
+                    }
+
+                    var hidden = false;
+
+                    if (typeof chart.toggleDataVisibility === 'function') {
+                        chart.toggleDataVisibility(index);
+                        hidden = !chart.getDataVisibility(index);
+                    } else {
+                        var meta = chart.getDatasetMeta(0);
+
+                        if (meta &amp;&amp; meta.data &amp;&amp; meta.data[index]) {
+                            meta.data[index].hidden = !meta.data[index].hidden;
+                            hidden = meta.data[index].hidden;
+                        }
+                    }
+
+                    chart.update();
+                    updateCustomLegendStyle('.status-legend-item', index, hidden);
+                }
+
+                function toggleTrendDataset(index) {
+                    var chart = getPrimeFacesChart('trendLineChart');
+
+                    if (!chart) {
+                        return;
+                    }
+
+                    var meta = chart.getDatasetMeta(index);
+
+                    meta.hidden = meta.hidden === null
+                    ? !chart.data.datasets[index].hidden
+                    : null;
+
+                    chart.update();
+
+                    var hidden = meta.hidden === true;
+                    updateCustomLegendStyle('.trend-legend-item', index, hidden);
+                }
+
+                function updateCustomLegendStyle(selector, index, hidden) {
+                    var item = document.querySelector(selector + '[data-index="' + index + '"]');
+
+                    if (!item) {
+                        return;
+                    }
+
+                    item.style.opacity = hidden ? '0.35' : '1';
                 }
             </h:outputScript>
 
@@ -97,17 +310,62 @@
                         <h3><i class="pi pi-chart-pie" style="margin-right:6px;"></i>Κατανομή Κατάστασης</h3>
                     </div>
                     <div class="chart-box-body">
+
+                        <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:18px; margin-bottom:12px;">
+                            <ui:repeat value="#{dashboardController.statusLegendItems}" var="item" varStatus="status">
+
+                                <a href="#"
+                                   class="status-legend-item"
+                                   data-index="#{status.index}"
+                                   onclick="togglePieSlice(#{status.index}); return false;"
+                                   style="display:flex; align-items:center; gap:7px; font-size:0.9rem; color:#555; text-decoration:none; cursor:pointer;">
+
+                                    <span style="width:52px; height:14px; display:inline-block; background-color:#{item.color};"></span>
+                                    <span>#{item.label}</span>
+
+                                </a>
+
+                            </ui:repeat>
+                        </div>
+
                         <p:pieChart model="#{dashboardController.pieModel}"
+                                    widgetVar="statusPieChart"
+                                    extender="pieChartExtender"
                                     style="width:100%; height:360px;" />
+
                     </div>
                 </div>
 
                 <div class="chart-box">
                     <div class="chart-box-header">
-                        <h3><i class="pi pi-chart-bar" style="margin-right:6px;"></i>Αιτήματα ανά Τύπο Άδειας</h3>
+                        <h3>
+                            <i class="pi pi-chart-bar" style="margin-right:6px;"></i>
+                            Αιτήματα ανά Τύπο Άδειας
+                        </h3>
                     </div>
+
                     <div class="chart-box-body">
+
+                        <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:18px; margin-bottom:12px;">
+                            <ui:repeat value="#{dashboardController.activeBarLeaveTypes}" var="type" varStatus="status">
+
+                                <a href="#"
+                                   class="leave-type-legend-item"
+                                   data-index="#{status.index}"
+                                   onclick="toggleLeaveTypeBar(#{status.index}); return false;"
+                                   style="display:flex; align-items:center; gap:7px; font-size:0.9rem; color:#555; text-decoration:none; cursor:pointer;">
+
+                                    <span style="width:52px; height:14px; display:inline-block; background-color:#{type.color};"></span>
+                                    <span>#{type.displayName}</span>
+
+                                </a>
+
+                            </ui:repeat>
+                        </div>
+
                         <p:barChart model="#{dashboardController.barModel}"
+                                    widgetVar="leaveTypeBarChart"
+                                    extender="barChartExtender"
                                     style="width:100%; height:360px;" />
                     </div>
                 </div>
@@ -120,8 +378,29 @@
                         <h3><i class="pi pi-chart-line" style="margin-right:6px;"></i>Τάσεις Αδειών ανά Μήνα και Τύπο</h3>
                     </div>
                     <div class="chart-box-body">
+
+                        <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:18px; margin-bottom:12px;">
+                            <ui:repeat value="#{dashboardController.trendLeaveTypes}" var="type" varStatus="status">
+
+                                <a href="#"
+                                   class="trend-legend-item"
+                                   data-index="#{status.index}"
+                                   onclick="toggleTrendDataset(#{status.index}); return false;"
+                                   style="display:flex; align-items:center; gap:7px; font-size:0.9rem; color:#555; text-decoration:none; cursor:pointer;">
+
+                                    <span style="width:52px; height:14px; display:inline-block; background-color:#{type.color};"></span>
+                                    <span>#{type.displayName}</span>
+
+                                </a>
+
+                            </ui:repeat>
+                        </div>
+
                         <p:lineChart model="#{dashboardController.trendModel}"
+                                     widgetVar="trendLineChart"
+                                     extender="lineChartExtender"
                                      style="width:100%; height:360px;" />
+
                     </div>
                 </div>
             </div>
