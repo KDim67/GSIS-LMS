@@ -260,8 +260,8 @@ public class DashboardController implements Serializable {
         }
 
         LocalDate today = LocalDate.now();
-        LocalDate from = today.minusMonths(1);
-        LocalDate to = today.plusMonths(3);
+        LocalDate from = LocalDate.of(today.getYear(), 1, 1);
+        LocalDate to = LocalDate.of(today.getYear() + 1, 12, 31);
         List<LeaveRequest> approved = managerService.getApprovedRequestsForTeam(manager, from, to);
 
         for (LeaveRequest request : approved) {
