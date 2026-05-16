@@ -810,3 +810,28 @@ body .ui-growl-item-container {
     background-color: #28a745 !important;
     border-color: #28a745 !important;
 }
+
+.center-column-header {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.center-column-header .ui-column-title {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.center-column-header .ui-sortable-column-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    float: none !important;
+    position: static !important;
+    margin-left: 8px !important;
+    vertical-align: middle !important;
+    transform: none !important;
+}
