@@ -15,9 +15,10 @@
                     <i class="pi pi-calendar"></i>
                     Ιστορικό Αδειών
                 </h2>
-                <span class="badge badge-pending">
+                <span class="badge badge-pending" style="text-transform:none;">
                     <i class="pi pi-list"></i>
-                    #{employeeController.leaveHistory.size()} #{employeeController.leaveHistory.size() eq 1 ? 'ΑΙΤΗΜΑ' : 'ΑΙΤΗΜΑΤΑ'}
+                    #{employeeController.leaveHistory.size()}
+                    #{employeeController.leaveHistory.size() eq 1 ? 'ΑΙΤΗΜΑ' : 'ΑΙΤΗΜΑΤΑ'}
                 </span>
             </div>
 
@@ -30,20 +31,31 @@
                          rows="10"
                          paginatorPosition="bottom"
                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                         rowsPerPageTemplate="10,20,50"
+                         rowsPerPageTemplate="10,30,50"
                          style="margin-top:0;">
 
-                <p:column headerText="ΤΥΠΟΣ ΑΔΕΙΑΣ" sortBy="#{leaveReq.leaveType}">
-                    <span class="badge badge-pending" style="text-transform:none;">#{leaveReq.leaveType}</span>
+                <p:column headerText="ΤΥΠΟΣ ΑΔΕΙΑΣ"
+                          sortBy="#{leaveReq.leaveType}"
+                          headerStyleClass="center-column-header"
+                          style="text-align:center; width:170px;">
+                    <span class="badge badge-pending" style="text-transform:none;">
+                        #{leaveReq.leaveType}
+                    </span>
                 </p:column>
 
-                <p:column headerText="ΑΠΟ" sortBy="#{leaveReq.startDate}">
+                <p:column headerText="ΑΠΟ"
+                          sortBy="#{leaveReq.startDate}"
+                          headerStyleClass="center-column-header"
+                          style="text-align:center; width:120px;">
                     <h:outputText value="#{leaveReq.startDate}">
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="ΕΩΣ" sortBy="#{leaveReq.endDate}">
+                <p:column headerText="ΕΩΣ"
+                          sortBy="#{leaveReq.endDate}"
+                          headerStyleClass="center-column-header"
+                          style="text-align:center; width:120px;">
                     <h:outputText value="#{leaveReq.endDate}">
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                     </h:outputText>
@@ -51,23 +63,43 @@
 
                 <p:column headerText="ΗΜΕΡΕΣ"
                           sortBy="#{leaveReq.workingDays}"
-                          style="text-align:center; width:80px;">
-                    <span class="fw-bold text-blue">#{leaveReq.workingDays}</span>
+                          headerStyleClass="center-column-header"
+                          style="text-align:center; width:90px;">
+                    <span class="fw-bold text-blue">
+                        #{leaveReq.workingDays}
+                    </span>
                 </p:column>
 
-                <p:column headerText="ΚΑΤΑΣΤΑΣΗ" sortBy="#{leaveReq.status}">
-                    <span class="#{leaveReq.status.name() eq 'APPROVED' ? 'badge badge-approved' : leaveReq.status.name() eq 'REJECTED' ? 'badge badge-rejected' : 'badge badge-pending'}" style="text-transform:none;">
+                <p:column headerText="ΚΑΤΑΣΤΑΣΗ"
+                          sortBy="#{leaveReq.status}"
+                          headerStyleClass="center-column-header"
+                          style="text-align:center; width:150px;">
+                    <span class="#{leaveReq.status.name() eq 'APPROVED' ? 'badge badge-approved' : leaveReq.status.name() eq 'REJECTED' ? 'badge badge-rejected' : 'badge badge-pending'}"
+                          style="text-transform:none;">
+
+                        <i class="pi #{leaveReq.status.name() eq 'APPROVED' ? 'pi-check' : leaveReq.status.name() eq 'REJECTED' ? 'pi-times' : 'pi-clock'}"></i>
+
                         #{leaveReq.status.displayName}
                     </span>
                 </p:column>
 
-                <p:column headerText="ΑΙΤΙΟΛΟΓΗΣΗ">
-                    <h:outputText value="#{leaveReq.reason}" style="color:var(--text-sub);" />
+                <p:column headerText="ΑΙΤΙΟΛΟΓΗΣΗ"
+                          headerStyleClass="center-column-header"
+                          style="text-align:center; min-width:180px;">
+                    <h:outputText value="#{leaveReq.reason}"
+                                  rendered="#{not empty leaveReq.reason}"
+                                  style="color:var(--text-sub); font-size:0.875rem;" />
+
+                    <h:panelGroup rendered="#{empty leaveReq.reason}"
+                                  layout="block"
+                                  style="display:flex; justify-content:center; align-items:center; width:100%;">
+                        <span style="color:var(--text-sub);">-</span>
+                    </h:panelGroup>
                 </p:column>
 
                 <p:column headerText="ΣΧΟΛΙΟ ΠΡΟΪΣΤΑΜΕΝΟΥ"
-                          style="width:220px; min-width:220px;"
-                          headerStyle="text-align:left; padding-left:16px; padding-right:24px;">
+                          headerStyleClass="center-column-header"
+                          style="width:220px; min-width:220px; text-align:center;">
                     <h:panelGroup rendered="#{not empty leaveReq.managerComment}"
                                   layout="block"
                                   style="display:flex; justify-content:center; align-items:center; width:100%;">
