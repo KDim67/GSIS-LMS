@@ -6,7 +6,7 @@
                 template="/WEB-INF/template/layout.xhtml">
 
     <ui:define name="content">
-        
+
         <h:form id="requestsForm">
             <p:growl id="messages" showDetail="true" life="4000" />
 
@@ -15,9 +15,10 @@
                     <i class="pi pi-list"></i>
                     Εκκρεμή Αιτήματα Άδειας
                 </h2>
-                <span class="badge badge-pending">
+                <span class="badge badge-pending" style="text-transform:none;">
                     <i class="pi pi-clock"></i>
-                    #{managerController.pendingRequests.size()} ΕΚΚΡΕΜΗ
+                    #{managerController.pendingRequests.size()}
+                    #{managerController.pendingRequests.size() eq 1 ? 'ΕΚΚΡΕΜΕΣ' : 'ΕΚΚΡΕΜΗ'}
                 </span>
             </div>
 
@@ -26,15 +27,23 @@
                                  value="Μαζική Έγκριση"
                                  styleClass="btn-approve"
                                  disabled="#{empty managerController.selectedRequests}"
-                                 action="#{managerController.bulkApprove}"
-                                 update="@form" />
+                                 process="@this"
+                                 update=":bulkActionForm:bulkActionPanel"
+                                 oncomplete="PF('bulkActionDialog').show()">
+                    <f:setPropertyActionListener value="APPROVE" target="#{managerController.pendingAction}" />
+                    <f:setPropertyActionListener value="" target="#{managerController.managerComment}" />
+                </p:commandButton>
 
                 <p:commandButton icon="pi pi-times"
                                  value="Μαζική Απόρριψη"
                                  styleClass="btn-reject"
                                  disabled="#{empty managerController.selectedRequests}"
-                                 update=":bulkRejectForm:bulkRejectPanel"
-                                 oncomplete="PF('bulkRejectDialog').show()" />
+                                 process="@this"
+                                 update=":bulkActionForm:bulkActionPanel"
+                                 oncomplete="PF('bulkActionDialog').show()">
+                    <f:setPropertyActionListener value="REJECT" target="#{managerController.pendingAction}" />
+                    <f:setPropertyActionListener value="" target="#{managerController.managerComment}" />
+                </p:commandButton>
             </div>
 
             <p:dataTable id="requestsTable"
@@ -54,9 +63,13 @@
                 <p:ajax event="rowUnselectCheckbox" update="@form" />
                 <p:ajax event="toggleSelect" update="@form" />
 
-                <p:column selectionMode="multiple" style="width:34px; text-align:center;" />
+                <p:column selectionMode="multiple"
+                          headerStyleClass="center-column-header"
+                          style="width:34px; text-align:center;" />
 
-                <p:column headerText="ΥΠΑΛΛΗΛΟΣ" sortBy="#{leaveReq.employee.lastName}">
+                <p:column headerText="ΥΠΑΛΛΗΛΟΣ"
+                          sortBy="#{leaveReq.employee.lastName}"
+                          headerStyleClass="center-column-header">
                     <div style="display:flex; align-items:center; gap:8px;">
                         <span style="width:32px; height:32px; border-radius:50%;
                                      background:var(--blue-light); color:var(--blue);
@@ -70,31 +83,65 @@
                     </div>
                 </p:column>
 
-                <p:column headerText="ΤΥΠΟΣ ΑΔΕΙΑΣ" sortBy="#{leaveReq.leaveType}">
-                    <span class="badge badge-pending" style="text-transform:none;">#{leaveReq.leaveType}</span>
+                <p:column headerText="ΤΥΠΟΣ ΑΔΕΙΑΣ"
+                          sortBy="#{leaveReq.leaveType}"
+                          headerStyleClass="center-column-header"
+                          style="text-align:center;">
+                    <span class="badge badge-pending" style="text-transform:none;">
+                        #{leaveReq.leaveType}
+                    </span>
                 </p:column>
 
-                <p:column headerText="ΑΠΟ" sortBy="#{leaveReq.startDate}">
+                <p:column headerText="ΑΠΟ"
+                          sortBy="#{leaveReq.startDate}"
+                          headerStyleClass="center-column-header"
+                          style="text-align:center;">
                     <h:outputText value="#{leaveReq.startDate}">
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="ΕΩΣ" sortBy="#{leaveReq.endDate}">
+                <p:column headerText="ΕΩΣ"
+                          sortBy="#{leaveReq.endDate}"
+                          headerStyleClass="center-column-header"
+                          style="text-align:center;">
                     <h:outputText value="#{leaveReq.endDate}">
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="ΗΜΕΡΕΣ" style="text-align:center; width:80px;">
-                    <span class="fw-bold text-blue">#{leaveReq.workingDays}</span>
+                <p:column headerText="ΗΜΕΡΕΣ"
+                          sortBy="#{leaveReq.workingDays}"
+                          headerStyleClass="center-column-header"
+                          style="text-align:center; width:80px;">
+                    <span class="fw-bold text-blue">
+                        #{leaveReq.workingDays}
+                    </span>
                 </p:column>
 
-                <p:column headerText="ΑΙΤΙΟΛΟΓΗΣΗ">
-                    <h:outputText value="#{leaveReq.reason}" style="color:var(--text-sub);" />
+                <p:column headerText="ΑΙΤΙΟΛΟΓΗΣΗ"
+                          headerStyleClass="center-column-header"
+                          style="text-align:center; min-width:180px;">
+
+                    <h:panelGroup rendered="#{not empty leaveReq.reason}"
+                                  layout="block"
+                                  style="display:flex; justify-content:center; align-items:center; width:100%;">
+                        <span style="color:var(--text-sub); font-size:0.875rem;">
+                            #{leaveReq.reason}
+                        </span>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{empty leaveReq.reason}"
+                                  layout="block"
+                                  style="display:flex; justify-content:center; align-items:center; width:100%;">
+                        <span style="color:var(--text-sub);">-</span>
+                    </h:panelGroup>
+
                 </p:column>
 
-                <p:column headerText="ΕΝΕΡΓΕΙΕΣ" style="width:290px; text-align:center;">
+                <p:column headerText="ΕΝΕΡΓΕΙΕΣ"
+                          headerStyleClass="center-column-header"
+                          style="width:290px; text-align:center;">
                     <div class="table-actions">
                         <p:commandButton icon="pi pi-check"
                                          value="Έγκριση"
@@ -158,10 +205,22 @@
                         </div>
 
                         <div class="dialog-comment-wrap">
-                            <label>ΣΧΟΛΙΟ ΔΙΑΧΕΙΡΙΣΤΗ
-                                <span class="text-muted">(ΑΠΑΙΤΕΙΤΑΙ ΓΙΑ ΑΠΟΡΡΙΨΗ</span>
+                            <label>
+                                ΣΧΟΛΙΟ ΔΙΑΧΕΙΡΙΣΤΗ
+
+                                <h:panelGroup rendered="#{managerController.pendingAction eq 'APPROVE'}">
+                                    <span class="text-muted">(ΠΡΟΑΙΡΕΤΙΚΟ)</span>
+                                </h:panelGroup>
+
+                                <h:panelGroup rendered="#{managerController.pendingAction eq 'REJECT'}">
+                                    <span class="text-muted">(ΑΠΑΙΤΕΙΤΑΙ)</span>
+                                </h:panelGroup>
                             </label>
-                            <p:inputTextarea rows="4" style="width:100%;" placeholder="Προσθέστε σχόλιο..." value="#{managerController.managerComment}" />
+
+                            <p:inputTextarea rows="4"
+                                             style="width:100%;"
+                                             placeholder="Προσθέστε σχόλιο..."
+                                             value="#{managerController.managerComment}" />
                         </div>
 
                         <div class="dialog-actions">
@@ -173,8 +232,8 @@
                             <p:commandButton value="Επιβεβαίωση Απόρριψης"
                                              rendered="#{managerController.pendingAction eq 'REJECT'}"
                                              action="#{managerController.rejectLeave}"
-                                             update=":requestsForm"
-                                             oncomplete="PF('actionDialog').hide()"
+                                             update=":requestsForm :dialogForm"
+                                             oncomplete="if (!args.validationFailed) PF('actionDialog').hide();"
                                              styleClass="btn-reject"
                                              icon="pi pi-times" />
 
@@ -192,8 +251,8 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog header="Μαζική Απόρριψη Αιτημάτων"
-                  widgetVar="bulkRejectDialog"
+        <p:dialog header="#{managerController.pendingAction eq 'APPROVE' ? 'Μαζική Έγκριση Αιτημάτων' : 'Μαζική Απόρριψη Αιτημάτων'}"
+                  widgetVar="bulkActionDialog"
                   modal="true"
                   showEffect="fade"
                   hideEffect="fade"
@@ -201,26 +260,58 @@
                   appendTo="@(body)"
                   style="width:480px;">
 
-            <h:form id="bulkRejectForm">
-                <p:outputPanel id="bulkRejectPanel">
+            <h:form id="bulkActionForm">
+                <p:outputPanel id="bulkActionPanel">
+
+                    <div class="dialog-employee-info">
+                        <i class="#{managerController.pendingAction eq 'APPROVE' ? 'pi pi-check-circle' : 'pi pi-times-circle'}"></i>
+                        #{managerController.pendingAction eq 'APPROVE'
+                            ? 'Έγκριση επιλεγμένων αιτημάτων'
+                            : 'Απόρριψη επιλεγμένων αιτημάτων'}
+                    </div>
+
                     <div class="dialog-comment-wrap">
-                        <label>ΣΧΟΛΙΟ ΔΙΑΧΕΙΡΙΣΤΗ</label>
-                        <p:inputTextarea rows="4" style="width:100%;" placeholder="Προσθέστε σχόλιο..." value="#{managerController.managerComment}" />
+                        <label>
+                            ΣΧΟΛΙΟ ΔΙΑΧΕΙΡΙΣΤΗ
+
+                            <h:panelGroup rendered="#{managerController.pendingAction eq 'APPROVE'}">
+                                <span class="text-muted">(ΠΡΟΑΙΡΕΤΙΚΟ)</span>
+                            </h:panelGroup>
+
+                            <h:panelGroup rendered="#{managerController.pendingAction eq 'REJECT'}">
+                                <span class="text-muted">(ΑΠΑΙΤΕΙΤΑΙ)</span>
+                            </h:panelGroup>
+                        </label>
+
+                        <p:inputTextarea rows="4"
+                                         style="width:100%;"
+                                         placeholder="Προσθέστε σχόλιο..."
+                                         value="#{managerController.managerComment}" />
                     </div>
 
                     <div class="dialog-actions">
                         <p:commandButton value="Ακύρωση"
                                          icon="pi pi-ban"
                                          styleClass="btn-export"
-                                         onclick="PF('bulkRejectDialog').hide(); return false;" />
+                                         onclick="PF('bulkActionDialog').hide(); return false;" />
+
+                        <p:commandButton value="Επιβεβαίωση Έγκρισης"
+                                         rendered="#{managerController.pendingAction eq 'APPROVE'}"
+                                         action="#{managerController.bulkApprove}"
+                                         update=":requestsForm :bulkActionForm"
+                                         oncomplete="PF('bulkActionDialog').hide()"
+                                         styleClass="btn-approve"
+                                         icon="pi pi-check" />
 
                         <p:commandButton value="Επιβεβαίωση Απόρριψης"
+                                         rendered="#{managerController.pendingAction eq 'REJECT'}"
                                          action="#{managerController.bulkReject}"
-                                         update=":requestsForm"
-                                         oncomplete="PF('bulkRejectDialog').hide()"
+                                         update=":requestsForm :bulkActionForm"
+                                         oncomplete="if (!args.validationFailed) PF('bulkActionDialog').hide();"
                                          styleClass="btn-reject"
                                          icon="pi pi-times" />
                     </div>
+
                 </p:outputPanel>
             </h:form>
         </p:dialog>

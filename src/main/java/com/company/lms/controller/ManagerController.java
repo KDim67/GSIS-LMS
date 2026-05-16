@@ -72,8 +72,15 @@ public class ManagerController implements Serializable {
     public void rejectLeave() {
         try {
             if (managerComment == null || managerComment.trim().isEmpty()) {
-                FacesContext.getCurrentInstance().addMessage(null, 
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Προειδοποίηση", "Απαιτείται σχόλιο για την απόρριψη."));
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(
+                                FacesMessage.SEVERITY_WARN,
+                                "Προειδοποίηση",
+                                "Απαιτείται σχόλιο για την απόρριψη."
+                        ));
+
+                FacesContext.getCurrentInstance().validationFailed();
+
                 return;
             }
 
@@ -101,7 +108,9 @@ public class ManagerController implements Serializable {
             int count = managerService.approveLeaves(getSelectedRequestIds(), currentManager, managerComment);
 
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Επιτυχία", "Εγκρίθηκαν " + count + " αιτήματα"));
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_INFO,
+                            "Επιτυχία", getBulkApproveMessage(count)));
 
             managerComment = null;
             selectedRequests = new ArrayList<>();
@@ -110,17 +119,32 @@ public class ManagerController implements Serializable {
 
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Σφάλμα", e.getMessage()));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Σφάλμα", e.getMessage()));
         }
     }
 
     public void bulkReject() {
         try {
+            if (managerComment == null || managerComment.trim().isEmpty()) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(
+                                FacesMessage.SEVERITY_WARN,
+                                "Προειδοποίηση",
+                                "Απαιτείται σχόλιο για την απόρριψη."
+                        ));
+
+                FacesContext.getCurrentInstance().validationFailed();
+
+                return;
+            }
+
             Employee currentManager = loginController.getLoggedInUser();
             int count = managerService.rejectLeaves(getSelectedRequestIds(), currentManager, managerComment);
 
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Επιτυχία", "Απορρίφθηκαν " + count + " αιτήματα"));
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_INFO,
+                            "Επιτυχία", getBulkRejectMessage(count)));
 
             managerComment = null;
             selectedRequests = new ArrayList<>();
@@ -129,8 +153,22 @@ public class ManagerController implements Serializable {
 
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Σφάλμα", e.getMessage()));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Σφάλμα", e.getMessage()));
         }
+    }
+
+    private String getRequestWord(int count) {
+        return count == 1 ? "αίτημα" : "αιτήματα";
+    }
+
+    private String getBulkApproveMessage(int count) {
+        return (count == 1 ? "Εγκρίθηκε " : "Εγκρίθηκαν ")
+                + count + " " + getRequestWord(count);
+    }
+
+    private String getBulkRejectMessage(int count) {
+        return (count == 1 ? "Απορρίφθηκε " : "Απορρίφθηκαν ")
+                + count + " " + getRequestWord(count);
     }
 
     private List<Integer> getSelectedRequestIds() {
@@ -150,6 +188,6 @@ public class ManagerController implements Serializable {
     public void setSelectedRequest(LeaveRequest selectedRequest) { this.selectedRequest = selectedRequest; }
     public String getManagerComment() { return managerComment; }
     public void setManagerComment(String managerComment) { this.managerComment = managerComment; }
-        public String getPendingAction() { return pendingAction; }
+    public String getPendingAction() { return pendingAction; }
     public void setPendingAction(String pendingAction) { this.pendingAction = pendingAction; }
 }
