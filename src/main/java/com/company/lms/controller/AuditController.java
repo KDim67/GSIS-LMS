@@ -84,7 +84,7 @@ public class AuditController implements Serializable {
             return "";
         }
 
-        return log.getAction();
+        return getActionDisplayName(log.getAction());
     }
 
     public String exportTargetId(AuditLog log) {
@@ -96,8 +96,8 @@ public class AuditController implements Serializable {
     }
 
     public String exportComment(AuditLog log) {
-        if (log == null || log.getComment() == null) {
-            return "";
+        if (log == null || log.getComment() == null || log.getComment().isBlank()) {
+            return "-";
         }
 
         return log.getComment();
@@ -228,5 +228,17 @@ public class AuditController implements Serializable {
         }
 
         return fullName + " - " + email;
+    }
+
+    public String getActionDisplayName(String action) {
+        if (action == null || action.isBlank()) {
+            return "";
+        }
+
+        return switch (action) {
+            case "APPROVE" -> "Εγκρίθηκε";
+            case "REJECT" -> "Απορρίφθηκε";
+            default -> action;
+        };
     }
 }
